@@ -1,3 +1,4 @@
+.direnv
 .idea
 /target/
 **/*.rs.bk
@@ -7,5 +8,6 @@ npm-shrinkwrap.json
 yarn.lock
 /publish
 /publish.exe
+result
 .vscode
 webdriver.json
