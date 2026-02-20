@@ -46,8 +46,10 @@ pub(crate) static BUILTIN_IDENTS: Lazy<BTreeSet<&'static str>> = Lazy::new(|| {
         "Float64Array",
         // Generic js-sys types
         "JsString",
+        "JsOption",
         "ArrayTuple",
         "Symbol",
+        "BigInt",
         "JsError",
         "Boolean",
         "Number",

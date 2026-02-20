@@ -35,23 +35,25 @@ extern "C" {
     #[wasm_bindgen(method, setter = "format")]
     pub fn set_format(this: &VideoFrameCopyToOptions, val: VideoPixelFormat);
     #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "PlaneLayout")]
     #[doc = "Get the `layout` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `VideoFrameCopyToOptions`*"]
+    #[doc = "*This API requires the following crate features to be activated: `PlaneLayout`, `VideoFrameCopyToOptions`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     #[wasm_bindgen(method, getter = "layout")]
     pub fn get_layout(this: &VideoFrameCopyToOptions) -> Option<::js_sys::Array<PlaneLayout>>;
     #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "PlaneLayout")]
     #[doc = "Change the `layout` field of this object."]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `VideoFrameCopyToOptions`*"]
+    #[doc = "*This API requires the following crate features to be activated: `PlaneLayout`, `VideoFrameCopyToOptions`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     #[wasm_bindgen(method, setter = "layout")]
-    pub fn set_layout(this: &VideoFrameCopyToOptions, val: &::wasm_bindgen::JsValue);
+    pub fn set_layout(this: &VideoFrameCopyToOptions, val: &[PlaneLayout]);
     #[cfg(web_sys_unstable_apis)]
     #[cfg(feature = "DomRectInit")]
     #[doc = "Get the `rect` field of this object."]
@@ -94,8 +96,9 @@ impl VideoFrameCopyToOptions {
         self
     }
     #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "PlaneLayout")]
     #[deprecated = "Use `set_layout()` instead."]
-    pub fn layout(&mut self, val: &::wasm_bindgen::JsValue) -> &mut Self {
+    pub fn layout(&mut self, val: &[PlaneLayout]) -> &mut Self {
         self.set_layout(val);
         self
     }

@@ -22,7 +22,9 @@ extern "C" {
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     #[wasm_bindgen(method, getter = "fillLightMode")]
-    pub fn get_fill_light_mode(this: &PhotoCapabilities) -> Option<::js_sys::Array<FillLightMode>>;
+    pub fn get_fill_light_mode(
+        this: &PhotoCapabilities,
+    ) -> Option<::js_sys::Array<::js_sys::JsString>>;
     #[cfg(web_sys_unstable_apis)]
     #[doc = "Change the `fillLightMode` field of this object."]
     #[doc = ""]
@@ -31,7 +33,7 @@ extern "C" {
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     #[wasm_bindgen(method, setter = "fillLightMode")]
-    pub fn set_fill_light_mode(this: &PhotoCapabilities, val: &::wasm_bindgen::JsValue);
+    pub fn set_fill_light_mode(this: &PhotoCapabilities, val: &[::js_sys::JsString]);
     #[cfg(web_sys_unstable_apis)]
     #[cfg(feature = "MediaSettingsRange")]
     #[doc = "Get the `imageHeight` field of this object."]
@@ -108,7 +110,7 @@ impl PhotoCapabilities {
     }
     #[cfg(web_sys_unstable_apis)]
     #[deprecated = "Use `set_fill_light_mode()` instead."]
-    pub fn fill_light_mode(&mut self, val: &::wasm_bindgen::JsValue) -> &mut Self {
+    pub fn fill_light_mode(&mut self, val: &[::js_sys::JsString]) -> &mut Self {
         self.set_fill_light_mode(val);
         self
     }

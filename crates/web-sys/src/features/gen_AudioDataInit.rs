@@ -30,8 +30,38 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[deprecated(
+        note = "Use `set_data_buffer_source()` or `set_data_u8_slice()` or `set_data_u8_array()` instead."
+    )]
     #[wasm_bindgen(method, setter = "data")]
     pub fn set_data(this: &AudioDataInit, val: &::js_sys::Object);
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `data` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `AudioDataInit`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "data")]
+    pub fn set_data_buffer_source(this: &AudioDataInit, val: &::js_sys::Object);
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `data` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `AudioDataInit`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "data")]
+    pub fn set_data_u8_slice(this: &AudioDataInit, val: &mut [u8]);
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `data` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `AudioDataInit`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "data")]
+    pub fn set_data_u8_array(this: &AudioDataInit, val: &::js_sys::Uint8Array);
     #[cfg(web_sys_unstable_apis)]
     #[cfg(feature = "AudioSampleFormat")]
     #[doc = "Get the `format` field of this object."]
@@ -122,8 +152,27 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[deprecated(note = "Use `set_timestamp_i32()` or `set_timestamp_f64()` instead.")]
     #[wasm_bindgen(method, setter = "timestamp")]
     pub fn set_timestamp(this: &AudioDataInit, val: f64);
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `timestamp` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `AudioDataInit`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "timestamp")]
+    pub fn set_timestamp_i32(this: &AudioDataInit, val: i32);
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `timestamp` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `AudioDataInit`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "timestamp")]
+    pub fn set_timestamp_f64(this: &AudioDataInit, val: f64);
     #[cfg(web_sys_unstable_apis)]
     #[doc = "Get the `transfer` field of this object."]
     #[doc = ""]
@@ -141,7 +190,7 @@ extern "C" {
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     #[wasm_bindgen(method, setter = "transfer")]
-    pub fn set_transfer(this: &AudioDataInit, val: &::wasm_bindgen::JsValue);
+    pub fn set_transfer(this: &AudioDataInit, val: &[::js_sys::ArrayBuffer]);
 }
 #[cfg(web_sys_unstable_apis)]
 impl AudioDataInit {
@@ -209,7 +258,7 @@ impl AudioDataInit {
     }
     #[cfg(web_sys_unstable_apis)]
     #[deprecated = "Use `set_transfer()` instead."]
-    pub fn transfer(&mut self, val: &::wasm_bindgen::JsValue) -> &mut Self {
+    pub fn transfer(&mut self, val: &[::js_sys::ArrayBuffer]) -> &mut Self {
         self.set_transfer(val);
         self
     }

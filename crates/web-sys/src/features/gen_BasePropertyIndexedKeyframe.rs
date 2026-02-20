@@ -18,8 +18,28 @@ extern "C" {
     #[doc = "Change the `composite` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `BasePropertyIndexedKeyframe`*"]
+    #[deprecated(
+        note = "Use `set_composite_opt_composite_operation()` or `set_composite_opt_composite_operation_sequence()` instead."
+    )]
     #[wasm_bindgen(method, setter = "composite")]
     pub fn set_composite(this: &BasePropertyIndexedKeyframe, val: &::wasm_bindgen::JsValue);
+    #[cfg(feature = "CompositeOperation")]
+    #[doc = "Change the `composite` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `BasePropertyIndexedKeyframe`*"]
+    #[wasm_bindgen(method, setter = "composite")]
+    pub fn set_composite_opt_composite_operation(
+        this: &BasePropertyIndexedKeyframe,
+        val: Option<CompositeOperation>,
+    );
+    #[doc = "Change the `composite` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `BasePropertyIndexedKeyframe`*"]
+    #[wasm_bindgen(method, setter = "composite")]
+    pub fn set_composite_opt_composite_operation_sequence(
+        this: &BasePropertyIndexedKeyframe,
+        val: &::wasm_bindgen::JsValue,
+    );
     #[doc = "Get the `easing` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `BasePropertyIndexedKeyframe`*"]
@@ -28,8 +48,22 @@ extern "C" {
     #[doc = "Change the `easing` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `BasePropertyIndexedKeyframe`*"]
+    #[deprecated(note = "Use `set_easing_str()` or `set_easing_str_sequence()` instead.")]
     #[wasm_bindgen(method, setter = "easing")]
     pub fn set_easing(this: &BasePropertyIndexedKeyframe, val: &::wasm_bindgen::JsValue);
+    #[doc = "Change the `easing` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `BasePropertyIndexedKeyframe`*"]
+    #[wasm_bindgen(method, setter = "easing")]
+    pub fn set_easing_str(this: &BasePropertyIndexedKeyframe, val: &str);
+    #[doc = "Change the `easing` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `BasePropertyIndexedKeyframe`*"]
+    #[wasm_bindgen(method, setter = "easing")]
+    pub fn set_easing_str_sequence(
+        this: &BasePropertyIndexedKeyframe,
+        val: &::wasm_bindgen::JsValue,
+    );
     #[doc = "Get the `offset` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `BasePropertyIndexedKeyframe`*"]
@@ -38,8 +72,22 @@ extern "C" {
     #[doc = "Change the `offset` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `BasePropertyIndexedKeyframe`*"]
+    #[deprecated(note = "Use `set_offset_opt_f64()` or `set_offset_opt_f64_sequence()` instead.")]
     #[wasm_bindgen(method, setter = "offset")]
     pub fn set_offset(this: &BasePropertyIndexedKeyframe, val: &::wasm_bindgen::JsValue);
+    #[doc = "Change the `offset` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `BasePropertyIndexedKeyframe`*"]
+    #[wasm_bindgen(method, setter = "offset")]
+    pub fn set_offset_opt_f64(this: &BasePropertyIndexedKeyframe, val: Option<f64>);
+    #[doc = "Change the `offset` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `BasePropertyIndexedKeyframe`*"]
+    #[wasm_bindgen(method, setter = "offset")]
+    pub fn set_offset_opt_f64_sequence(
+        this: &BasePropertyIndexedKeyframe,
+        val: &::wasm_bindgen::JsValue,
+    );
 }
 impl BasePropertyIndexedKeyframe {
     #[doc = "Construct a new `BasePropertyIndexedKeyframe`."]

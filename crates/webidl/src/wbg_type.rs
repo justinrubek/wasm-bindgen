@@ -8,8 +8,8 @@ use weedle::types::*;
 
 use crate::first_pass::FirstPassRecord;
 use crate::util::{
-    array, camel_case_ident, generic_ty, js_option_ty, option_ty, shared_ref, snake_case_ident,
-    Direction, TypePosition,
+    array, camel_case_ident, generic_ty, js_option_ty, option_ty, shared_ref, slice_ty,
+    snake_case_ident, Direction, TypePosition,
 };
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Debug)]
@@ -940,8 +940,15 @@ impl<'a> WbgType<'a> {
             WbgType::FrozenArray(_wbg_type)
             | WbgType::ObservableArray(_wbg_type)
             | WbgType::Sequence(_wbg_type) => {
-                if pos.is_argument() && !pos.inner {
+                if pos.is_argument() && !pos.inner && no_generics {
+                    // Legacy mode: no generics, fall back to &JsValue for arguments
                     Ok(js_value)
+                } else if pos.is_argument() && !pos.inner {
+                    // Generics mode: use &[T] for arguments
+                    let inner = _wbg_type
+                        .to_syn_type(pos.to_inner(), legacy, no_generics)?
+                        .unwrap_or_else(|| parse_quote!(::wasm_bindgen::JsValue));
+                    Ok(Some(shared_ref(slice_ty(inner), false)))
                 } else if no_generics {
                     // Backwards compat mode: no generics
                     Ok(js_sys("Array"))
@@ -1494,7 +1501,14 @@ impl IdentifierType<'_> {
                 Ok(externref(ty))
             }
             IdentifierType::Enum(name) => {
-                Ok(Some(ident_ty(rust_ident(camel_case_ident(name).as_str()))))
+                if pos.inner {
+                    // String enums are repr(u32) so they can't be used directly
+                    // in inner/slice positions. Use JsString instead, which is
+                    // repr(transparent) over JsValue.
+                    Ok(js_sys("JsString"))
+                } else {
+                    Ok(Some(ident_ty(rust_ident(camel_case_ident(name).as_str()))))
+                }
             }
             IdentifierType::UnsignedLongLong => {
                 WbgType::UnsignedLongLong.to_syn_type(pos, legacy, no_generics)

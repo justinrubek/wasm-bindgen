@@ -18,8 +18,37 @@ extern "C" {
     #[doc = "Change the `data` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[deprecated(
+        note = "Use `set_data_opt_buffer_source()` or `set_data_opt_u8_slice()` or `set_data_opt_u8_array()` or `set_data_opt_blob()` or `set_data_opt_str()` instead."
+    )]
     #[wasm_bindgen(method, setter = "data")]
     pub fn set_data(this: &WriteParams, val: &::wasm_bindgen::JsValue);
+    #[doc = "Change the `data` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[wasm_bindgen(method, setter = "data")]
+    pub fn set_data_opt_buffer_source(this: &WriteParams, val: Option<&::js_sys::Object>);
+    #[doc = "Change the `data` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[wasm_bindgen(method, setter = "data")]
+    pub fn set_data_opt_u8_slice(this: &WriteParams, val: Option<&mut [u8]>);
+    #[doc = "Change the `data` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[wasm_bindgen(method, setter = "data")]
+    pub fn set_data_opt_u8_array(this: &WriteParams, val: Option<&::js_sys::Uint8Array>);
+    #[cfg(feature = "Blob")]
+    #[doc = "Change the `data` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[wasm_bindgen(method, setter = "data")]
+    pub fn set_data_opt_blob(this: &WriteParams, val: Option<&Blob>);
+    #[doc = "Change the `data` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[wasm_bindgen(method, setter = "data")]
+    pub fn set_data_opt_str(this: &WriteParams, val: Option<&str>);
     #[doc = "Get the `position` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
@@ -28,8 +57,19 @@ extern "C" {
     #[doc = "Change the `position` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[deprecated(note = "Use `set_position_opt_u32()` or `set_position_opt_f64()` instead.")]
     #[wasm_bindgen(method, setter = "position")]
     pub fn set_position(this: &WriteParams, val: Option<f64>);
+    #[doc = "Change the `position` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[wasm_bindgen(method, setter = "position")]
+    pub fn set_position_opt_u32(this: &WriteParams, val: Option<u32>);
+    #[doc = "Change the `position` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[wasm_bindgen(method, setter = "position")]
+    pub fn set_position_opt_f64(this: &WriteParams, val: Option<f64>);
     #[doc = "Get the `size` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
@@ -38,8 +78,19 @@ extern "C" {
     #[doc = "Change the `size` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[deprecated(note = "Use `set_size_opt_u32()` or `set_size_opt_f64()` instead.")]
     #[wasm_bindgen(method, setter = "size")]
     pub fn set_size(this: &WriteParams, val: Option<f64>);
+    #[doc = "Change the `size` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[wasm_bindgen(method, setter = "size")]
+    pub fn set_size_opt_u32(this: &WriteParams, val: Option<u32>);
+    #[doc = "Change the `size` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `WriteParams`*"]
+    #[wasm_bindgen(method, setter = "size")]
+    pub fn set_size_opt_f64(this: &WriteParams, val: Option<f64>);
     #[cfg(feature = "WriteCommandType")]
     #[doc = "Get the `type` field of this object."]
     #[doc = ""]

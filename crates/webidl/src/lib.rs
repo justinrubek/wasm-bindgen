@@ -19,8 +19,9 @@ mod wbg_type;
 use crate::first_pass::OperationData;
 use crate::first_pass::{FirstPass, FirstPassRecord, InterfaceData, OperationId};
 use crate::generator::{
-    Const, Dictionary, DictionaryField, Enum, EnumVariant, Function, Interface, InterfaceAttribute,
-    InterfaceAttributeKind, InterfaceMethod, Namespace, NamespaceAttribute, NamespaceAttributeKind,
+    Const, Dictionary, DictionaryField, DictionaryFieldSetter, Enum, EnumVariant, Function,
+    Interface, InterfaceAttribute, InterfaceAttributeKind, InterfaceMethod, Namespace,
+    NamespaceAttribute, NamespaceAttributeKind,
 };
 use crate::traverse::TraverseType;
 use crate::util::{
@@ -41,7 +42,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::{fmt, iter};
-use wbg_type::{IdentifierType, WbgType};
+
 use weedle::attribute::ExtendedAttributeList;
 use weedle::common::Identifier;
 use weedle::dictionary::DictionaryMember;
@@ -529,24 +530,6 @@ impl<'src> FirstPassRecord<'src> {
 
         let wbg_type = field.type_.to_wbg_type(self);
 
-        let is_js_value_ref_option_type = match &wbg_type {
-            wbg_type::WbgType::JsOption(ty) => match **ty {
-                wbg_type::WbgType::Any => true,
-                WbgType::FrozenArray(ref _wbg_type) | WbgType::Sequence(ref _wbg_type) => true,
-                wbg_type::WbgType::Union(ref types) => !types.iter().all(|wbg_type| {
-                    matches!(
-                        wbg_type,
-                        WbgType::Identifier {
-                            ty: IdentifierType::Interface(..),
-                            ..
-                        }
-                    )
-                }),
-                _ => false,
-            },
-            _ => false,
-        };
-
         // use argument position now as we're just binding setters
         // Unstable APIs always use typed generics; stable uses legacy by default.
         let generics_compat = if unstable_override {
@@ -554,6 +537,29 @@ impl<'src> FirstPassRecord<'src> {
         } else {
             !self.options.next_unstable.get()
         };
+
+        // In legacy mode (no generics), nullable sequences/arrays collapse to &JsValue
+        // for the setter, with the builder using unwrap_or(&JsValue::NULL).
+        // With generics enabled, the types are precise (e.g. Option<&[T]>) so no collapse needed.
+        let is_js_value_ref_option_type = generics_compat
+            && match &wbg_type {
+                wbg_type::WbgType::JsOption(ty) => match **ty {
+                    wbg_type::WbgType::Any => true,
+                    wbg_type::WbgType::FrozenArray(..) | wbg_type::WbgType::Sequence(..) => true,
+                    wbg_type::WbgType::Union(ref types) => !types.iter().all(|wbg_type| {
+                        matches!(
+                            wbg_type,
+                            wbg_type::WbgType::Identifier {
+                                ty: wbg_type::IdentifierType::Interface(..),
+                                ..
+                            }
+                        )
+                    }),
+                    _ => false,
+                },
+                _ => false,
+            };
+
         let ty = wbg_type
             .to_syn_type(TypePosition::ARGUMENT, false, generics_compat)
             .ok()
@@ -568,27 +574,34 @@ impl<'src> FirstPassRecord<'src> {
             return_ty = optional_return_ty(return_ty);
         }
 
-        // Slice types aren't supported because they don't implement
-        // `Into<JsValue>`
-        match ty {
-            syn::Type::Reference(ref i) if matches!(&*i.elem, syn::Type::Slice(_)) => return None,
-            syn::Type::Path(ref path, ..) =>
-            // check that our inner don't contains slices either
-            {
-                for seg in path.path.segments.iter() {
-                    if let syn::PathArguments::AngleBracketed(ref arg) = seg.arguments {
-                        for elem in &arg.args {
-                            if let syn::GenericArgument::Type(syn::Type::Reference(ref i)) = elem {
-                                if matches!(&*i.elem, syn::Type::Slice(_)) {
-                                    return None;
+        // In legacy mode (no generics), slice types aren't supported because
+        // they don't implement `Into<JsValue>`. With generics enabled,
+        // &[T] where T: ErasableGeneric is supported via IntoWasmAbi.
+        if generics_compat {
+            match ty {
+                syn::Type::Reference(ref i) if matches!(&*i.elem, syn::Type::Slice(_)) => {
+                    return None
+                }
+                syn::Type::Path(ref path, ..) =>
+                // check that our inner don't contains slices either
+                {
+                    for seg in path.path.segments.iter() {
+                        if let syn::PathArguments::AngleBracketed(ref arg) = seg.arguments {
+                            for elem in &arg.args {
+                                if let syn::GenericArgument::Type(syn::Type::Reference(ref i)) =
+                                    elem
+                                {
+                                    if matches!(&*i.elem, syn::Type::Slice(_)) {
+                                        return None;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            _ => (),
-        };
+                _ => (),
+            };
+        }
 
         // Similarly i64/u64 aren't supported because they don't
         // implement `Into<JsValue>`
@@ -604,12 +617,46 @@ impl<'src> FirstPassRecord<'src> {
             return None;
         }
 
+        // Expand union types into multiple type-safe setters.
+        // The first setter keeps the original name (deprecated), additional ones get suffixes.
+        let flattened_types = wbg_type.flatten(None);
+        let setter_types = if flattened_types.len() > 1 {
+            let mut setters = vec![DictionaryFieldSetter {
+                ty: ty.clone(),
+                name_suffix: None,
+                deprecated: true,
+            }];
+            for flattened in &flattened_types {
+                if let Some(setter_ty) = flattened
+                    .to_syn_type(TypePosition::ARGUMENT, false, generics_compat)
+                    .ok()
+                    .flatten()
+                {
+                    let mut suffix = String::new();
+                    flattened.push_snake_case_name(&mut suffix);
+                    setters.push(DictionaryFieldSetter {
+                        ty: setter_ty,
+                        name_suffix: Some(suffix),
+                        deprecated: false,
+                    });
+                }
+            }
+            setters
+        } else {
+            vec![DictionaryFieldSetter {
+                ty: ty.clone(),
+                name_suffix: None,
+                deprecated: false,
+            }]
+        };
+
         Some(DictionaryField {
             required: field.required.is_some(),
             name: snake_case_ident(field.identifier.0),
             js_name: field.identifier.0.to_string(),
             ty,
             return_ty,
+            setter_types,
             is_js_value_ref_option_type,
             unstable: unstable_override,
             deprecated: get_rust_deprecated(&field.attributes)

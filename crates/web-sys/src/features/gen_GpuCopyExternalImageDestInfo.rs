@@ -68,8 +68,33 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[deprecated(
+        note = "Use `set_origin_u32_sequence()` or `set_origin_gpu_origin_3d_dict()` instead."
+    )]
     #[wasm_bindgen(method, setter = "origin")]
     pub fn set_origin(this: &GpuCopyExternalImageDestInfo, val: &::wasm_bindgen::JsValue);
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `origin` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `GpuCopyExternalImageDestInfo`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "origin")]
+    pub fn set_origin_u32_sequence(this: &GpuCopyExternalImageDestInfo, val: &[::js_sys::Number]);
+    #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "GpuOrigin3dDict")]
+    #[doc = "Change the `origin` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `GpuCopyExternalImageDestInfo`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "origin")]
+    pub fn set_origin_gpu_origin_3d_dict(
+        this: &GpuCopyExternalImageDestInfo,
+        val: &GpuOrigin3dDict,
+    );
     #[cfg(web_sys_unstable_apis)]
     #[cfg(feature = "GpuTexture")]
     #[doc = "Get the `texture` field of this object."]

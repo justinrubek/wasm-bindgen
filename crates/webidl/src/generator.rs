@@ -1,4 +1,4 @@
-use crate::util::{camel_case_ident, leading_colon_path_ty, raw_ident, rust_ident};
+use crate::util::{camel_case_ident, leading_colon_path_ty, raw_ident, rust_ident, shared_ref};
 use proc_macro2::Literal;
 use proc_macro2::TokenStream;
 use quote::format_ident;
@@ -8,7 +8,6 @@ use syn::{Ident, Type};
 
 use crate::constants::{BUILTIN_IDENTS, POLYFILL_INTERFACES};
 use crate::traverse::TraverseType;
-use crate::util::shared_ref;
 use crate::util::{get_cfg_features, mdn_doc, required_doc_string};
 use crate::wbg_type::WbgType;
 use crate::Options;
@@ -810,11 +809,24 @@ impl Interface<'_> {
     }
 }
 
+/// A single setter variant for a dictionary field (one per union member when expanded)
+pub struct DictionaryFieldSetter {
+    pub ty: Type,
+    pub name_suffix: Option<String>,
+    /// Whether this setter is deprecated (for backward-compat setters superseded by type-safe ones)
+    pub deprecated: bool,
+}
+
 pub struct DictionaryField {
     pub name: String,
     pub js_name: String,
+    /// Primary type (used for the getter return and builder method)
     pub ty: Type,
     pub return_ty: Type,
+    /// All setter variants - for union types, one per union member
+    pub setter_types: Vec<DictionaryFieldSetter>,
+    /// When true, the nullable type collapses: the setter takes `&JsValue` instead of
+    /// `Option<&JsValue>`, and the builder uses `unwrap_or(&JsValue::NULL)`.
     pub is_js_value_ref_option_type: bool,
     pub required: bool,
     pub unstable: bool,
@@ -829,22 +841,9 @@ impl DictionaryField {
         features: &BTreeSet<String>,
         cfg_features: &Option<syn::Attribute>,
     ) -> TokenStream {
-        let ty = &self.ty;
         let return_ty = &self.return_ty;
         let getter_name = format_ident!("get_{}", self.name);
-        let setter_name = self.setter_name();
         let js_name = &self.js_name;
-
-        let js_value_ref_type = shared_ref(
-            leading_colon_path_ty(vec![rust_ident("wasm_bindgen"), rust_ident("JsValue")]),
-            false,
-        );
-
-        let ty = if self.is_js_value_ref_option_type {
-            js_value_ref_type
-        } else {
-            ty.clone()
-        };
 
         let unstable_attr = maybe_unstable_attr(self.unstable);
         let unstable_docs = maybe_unstable_docs(self.unstable);
@@ -864,6 +863,67 @@ impl DictionaryField {
             &required_doc_string(options, features),
         );
 
+        // When is_js_value_ref_option_type is set, the nullable type collapses
+        // to &JsValue for backwards compatibility. This applies to the deprecated
+        // fallback setter (no suffix) — typed setters keep their real types.
+        let js_value_ref_type = if self.is_js_value_ref_option_type {
+            Some(shared_ref(
+                leading_colon_path_ty(vec![rust_ident("wasm_bindgen"), rust_ident("JsValue")]),
+                false,
+            ))
+        } else {
+            None
+        };
+
+        // Generate setters for each type variant.
+        // In stable mode (!next_unstable), the first variant (deprecated fallback)
+        // gets the JsValue override for backwards compat. In next_unstable mode,
+        // all variants use their real typed signatures.
+        let setters = self.setter_types.iter().enumerate().map(|(idx, setter)| {
+            let setter_name = match &setter.name_suffix {
+                Some(suffix) => format_ident!("set_{}_{}", self.name, suffix),
+                None => format_ident!("set_{}", self.name),
+            };
+            let ty = if idx == 0 && !options.next_unstable.get() {
+                js_value_ref_type.as_ref().unwrap_or(&setter.ty)
+            } else {
+                &setter.ty
+            };
+
+            // Get features for this specific setter type
+            let mut setter_features = BTreeSet::new();
+            add_features(&mut setter_features, ty);
+            setter_features.remove(&parent_ident.to_string());
+            let setter_cfg_features = get_cfg_features(options, &setter_features);
+
+            // Deprecate backward-compat setters that have type-safe alternatives
+            // But don't add our deprecation if the field is already deprecated
+            let setter_deprecated = if setter.deprecated && deprecated.is_none() {
+                let name = &self.name;
+                let alternatives: Vec<_> = self
+                    .setter_types
+                    .iter()
+                    .filter_map(|s| s.name_suffix.as_ref())
+                    .map(|s| format!("`set_{name}_{s}()`"))
+                    .collect();
+                let msg = format!("Use {} instead.", alternatives.join(" or "));
+                Some(quote!( #[deprecated(note = #msg)] ))
+            } else {
+                None
+            };
+
+            quote! {
+                #unstable_attr
+                #setter_cfg_features
+                #setter_doc_comment
+                #unstable_docs
+                #setter_deprecated
+                #deprecated
+                #[wasm_bindgen(method, setter = #js_name)]
+                pub fn #setter_name(this: &#parent_ident, val: #ty);
+            }
+        });
+
         quote! {
             #unstable_attr
             #cfg_features
@@ -873,13 +933,7 @@ impl DictionaryField {
             #[wasm_bindgen(method, getter = #js_name)]
             pub fn #getter_name(this: &#parent_ident) -> #return_ty;
 
-            #unstable_attr
-            #cfg_features
-            #setter_doc_comment
-            #unstable_docs
-            #deprecated
-            #[wasm_bindgen(method, setter = #js_name)]
-            pub fn #setter_name(this: &#parent_ident, val: #ty);
+            #(#setters)*
         }
     }
 
@@ -889,6 +943,7 @@ impl DictionaryField {
             js_name: _,
             ty,
             return_ty: _,
+            setter_types: _,
             is_js_value_ref_option_type: _,
             required: _,
             unstable,
@@ -901,6 +956,8 @@ impl DictionaryField {
         let setter_name = self.setter_name();
         let deprecated = format!("Use `{setter_name}()` instead.");
 
+        // When is_js_value_ref_option_type is set, the first setter takes &JsValue
+        // but the builder takes Option<&JsValue>, so unwrap_or bridges the types.
         let shim_args = if self.is_js_value_ref_option_type {
             quote! { val.unwrap_or(&::wasm_bindgen::JsValue::NULL) }
         } else {
@@ -925,7 +982,9 @@ impl DictionaryField {
     ) -> (BTreeSet<String>, Option<syn::Attribute>) {
         let mut features = BTreeSet::new();
 
-        add_features(&mut features, &self.ty);
+        // Only collect features from the return type (getter).
+        // Each setter computes its own features independently in generate_rust_shim.
+        add_features(&mut features, &self.return_ty);
 
         features.remove(&parent_name);
 
@@ -937,7 +996,15 @@ impl DictionaryField {
     }
 
     fn setter_name(&self) -> Ident {
-        format_ident!("set_{}", self.name)
+        // Use the first setter's name (which may include a suffix for union types)
+        match self
+            .setter_types
+            .first()
+            .and_then(|s| s.name_suffix.as_ref())
+        {
+            Some(suffix) => format_ident!("set_{}_{}", self.name, suffix),
+            None => format_ident!("set_{}", self.name),
+        }
     }
 }
 

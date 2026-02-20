@@ -33,10 +33,7 @@ extern "C" {
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     #[wasm_bindgen(method, setter = "contributingSources")]
-    pub fn set_contributing_sources(
-        this: &RtcEncodedVideoFrameMetadata,
-        val: &::wasm_bindgen::JsValue,
-    );
+    pub fn set_contributing_sources(this: &RtcEncodedVideoFrameMetadata, val: &[::js_sys::Number]);
     #[cfg(web_sys_unstable_apis)]
     #[doc = "Get the `dependencies` field of this object."]
     #[doc = ""]
@@ -55,8 +52,35 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[deprecated(
+        note = "Use `set_dependencies_u32_sequence()` or `set_dependencies_f64_sequence()` instead."
+    )]
     #[wasm_bindgen(method, setter = "dependencies")]
-    pub fn set_dependencies(this: &RtcEncodedVideoFrameMetadata, val: &::wasm_bindgen::JsValue);
+    pub fn set_dependencies(this: &RtcEncodedVideoFrameMetadata, val: &[::js_sys::Number]);
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `dependencies` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `RtcEncodedVideoFrameMetadata`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "dependencies")]
+    pub fn set_dependencies_u32_sequence(
+        this: &RtcEncodedVideoFrameMetadata,
+        val: &[::js_sys::Number],
+    );
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `dependencies` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `RtcEncodedVideoFrameMetadata`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "dependencies")]
+    pub fn set_dependencies_f64_sequence(
+        this: &RtcEncodedVideoFrameMetadata,
+        val: &[::js_sys::Number],
+    );
     #[cfg(web_sys_unstable_apis)]
     #[doc = "Get the `frameId` field of this object."]
     #[doc = ""]
@@ -73,8 +97,27 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[deprecated(note = "Use `set_frame_id_u32()` or `set_frame_id_f64()` instead.")]
     #[wasm_bindgen(method, setter = "frameId")]
     pub fn set_frame_id(this: &RtcEncodedVideoFrameMetadata, val: f64);
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `frameId` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `RtcEncodedVideoFrameMetadata`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "frameId")]
+    pub fn set_frame_id_u32(this: &RtcEncodedVideoFrameMetadata, val: u32);
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `frameId` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `RtcEncodedVideoFrameMetadata`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "frameId")]
+    pub fn set_frame_id_f64(this: &RtcEncodedVideoFrameMetadata, val: f64);
     #[cfg(web_sys_unstable_apis)]
     #[doc = "Get the `height` field of this object."]
     #[doc = ""]
@@ -217,8 +260,27 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[deprecated(note = "Use `set_timestamp_i32()` or `set_timestamp_f64()` instead.")]
     #[wasm_bindgen(method, setter = "timestamp")]
     pub fn set_timestamp(this: &RtcEncodedVideoFrameMetadata, val: f64);
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `timestamp` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `RtcEncodedVideoFrameMetadata`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "timestamp")]
+    pub fn set_timestamp_i32(this: &RtcEncodedVideoFrameMetadata, val: i32);
+    #[cfg(web_sys_unstable_apis)]
+    #[doc = "Change the `timestamp` field of this object."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `RtcEncodedVideoFrameMetadata`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[wasm_bindgen(method, setter = "timestamp")]
+    pub fn set_timestamp_f64(this: &RtcEncodedVideoFrameMetadata, val: f64);
     #[cfg(web_sys_unstable_apis)]
     #[doc = "Get the `width` field of this object."]
     #[doc = ""]
@@ -253,13 +315,13 @@ impl RtcEncodedVideoFrameMetadata {
     }
     #[cfg(web_sys_unstable_apis)]
     #[deprecated = "Use `set_contributing_sources()` instead."]
-    pub fn contributing_sources(&mut self, val: &::wasm_bindgen::JsValue) -> &mut Self {
+    pub fn contributing_sources(&mut self, val: &[::js_sys::Number]) -> &mut Self {
         self.set_contributing_sources(val);
         self
     }
     #[cfg(web_sys_unstable_apis)]
     #[deprecated = "Use `set_dependencies()` instead."]
-    pub fn dependencies(&mut self, val: &::wasm_bindgen::JsValue) -> &mut Self {
+    pub fn dependencies(&mut self, val: &[::js_sys::Number]) -> &mut Self {
         self.set_dependencies(val);
         self
     }
