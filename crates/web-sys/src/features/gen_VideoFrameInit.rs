@@ -86,18 +86,8 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    #[deprecated(note = "Use `set_duration_u32()` or `set_duration_f64()` instead.")]
     #[wasm_bindgen(method, setter = "duration")]
-    pub fn set_duration(this: &VideoFrameInit, val: f64);
-    #[cfg(web_sys_unstable_apis)]
-    #[doc = "Change the `duration` field of this object."]
-    #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `VideoFrameInit`*"]
-    #[doc = ""]
-    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    #[wasm_bindgen(method, setter = "duration")]
-    pub fn set_duration_u32(this: &VideoFrameInit, val: u32);
+    pub fn set_duration(this: &VideoFrameInit, val: u32);
     #[cfg(web_sys_unstable_apis)]
     #[doc = "Change the `duration` field of this object."]
     #[doc = ""]
@@ -179,18 +169,8 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    #[deprecated(note = "Use `set_timestamp_i32()` or `set_timestamp_f64()` instead.")]
     #[wasm_bindgen(method, setter = "timestamp")]
-    pub fn set_timestamp(this: &VideoFrameInit, val: f64);
-    #[cfg(web_sys_unstable_apis)]
-    #[doc = "Change the `timestamp` field of this object."]
-    #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `VideoFrameInit`*"]
-    #[doc = ""]
-    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    #[wasm_bindgen(method, setter = "timestamp")]
-    pub fn set_timestamp_i32(this: &VideoFrameInit, val: i32);
+    pub fn set_timestamp(this: &VideoFrameInit, val: i32);
     #[cfg(web_sys_unstable_apis)]
     #[doc = "Change the `timestamp` field of this object."]
     #[doc = ""]
@@ -255,7 +235,7 @@ impl VideoFrameInit {
     }
     #[cfg(web_sys_unstable_apis)]
     #[deprecated = "Use `set_duration()` instead."]
-    pub fn duration(&mut self, val: f64) -> &mut Self {
+    pub fn duration(&mut self, val: u32) -> &mut Self {
         self.set_duration(val);
         self
     }
@@ -280,7 +260,7 @@ impl VideoFrameInit {
     }
     #[cfg(web_sys_unstable_apis)]
     #[deprecated = "Use `set_timestamp()` instead."]
-    pub fn timestamp(&mut self, val: f64) -> &mut Self {
+    pub fn timestamp(&mut self, val: i32) -> &mut Self {
         self.set_timestamp(val);
         self
     }

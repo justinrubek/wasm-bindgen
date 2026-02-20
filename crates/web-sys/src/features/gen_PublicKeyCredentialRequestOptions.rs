@@ -76,9 +76,6 @@ extern "C" {
     #[doc = "Change the `challenge` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `PublicKeyCredentialRequestOptions`*"]
-    #[deprecated(
-        note = "Use `set_challenge_buffer_source()` or `set_challenge_u8_slice()` or `set_challenge_u8_array()` instead."
-    )]
     #[wasm_bindgen(method, setter = "challenge")]
     pub fn set_challenge(this: &PublicKeyCredentialRequestOptions, val: &::js_sys::Object);
     #[doc = "Change the `challenge` field of this object."]
@@ -185,6 +182,24 @@ impl PublicKeyCredentialRequestOptions {
         #[allow(unused_mut)]
         let mut ret: Self = ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::new());
         ret.set_challenge(challenge);
+        ret
+    }
+    #[doc = "Construct a new `PublicKeyCredentialRequestOptions`."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `PublicKeyCredentialRequestOptions`*"]
+    pub fn new_with_u8_slice(challenge: &mut [u8]) -> Self {
+        #[allow(unused_mut)]
+        let mut ret: Self = ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::new());
+        ret.set_challenge_u8_slice(challenge);
+        ret
+    }
+    #[doc = "Construct a new `PublicKeyCredentialRequestOptions`."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `PublicKeyCredentialRequestOptions`*"]
+    pub fn new_with_u8_array(challenge: &::js_sys::Uint8Array) -> Self {
+        #[allow(unused_mut)]
+        let mut ret: Self = ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::new());
+        ret.set_challenge_u8_array(challenge);
         ret
     }
     #[deprecated = "Use `set_allow_credentials()` instead."]

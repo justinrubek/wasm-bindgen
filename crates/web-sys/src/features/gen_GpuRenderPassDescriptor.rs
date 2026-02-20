@@ -98,18 +98,8 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    #[deprecated(note = "Use `set_max_draw_count_u32()` or `set_max_draw_count_f64()` instead.")]
     #[wasm_bindgen(method, setter = "maxDrawCount")]
-    pub fn set_max_draw_count(this: &GpuRenderPassDescriptor, val: f64);
-    #[cfg(web_sys_unstable_apis)]
-    #[doc = "Change the `maxDrawCount` field of this object."]
-    #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `GpuRenderPassDescriptor`*"]
-    #[doc = ""]
-    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    #[wasm_bindgen(method, setter = "maxDrawCount")]
-    pub fn set_max_draw_count_u32(this: &GpuRenderPassDescriptor, val: u32);
+    pub fn set_max_draw_count(this: &GpuRenderPassDescriptor, val: u32);
     #[cfg(web_sys_unstable_apis)]
     #[doc = "Change the `maxDrawCount` field of this object."]
     #[doc = ""]
@@ -205,7 +195,7 @@ impl GpuRenderPassDescriptor {
     }
     #[cfg(web_sys_unstable_apis)]
     #[deprecated = "Use `set_max_draw_count()` instead."]
-    pub fn max_draw_count(&mut self, val: f64) -> &mut Self {
+    pub fn max_draw_count(&mut self, val: u32) -> &mut Self {
         self.set_max_draw_count(val);
         self
     }

@@ -75,9 +75,6 @@ extern "C" {
     #[doc = "Change the `challenge` field of this object."]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `PublicKeyCredentialCreationOptions`*"]
-    #[deprecated(
-        note = "Use `set_challenge_buffer_source()` or `set_challenge_u8_slice()` or `set_challenge_u8_array()` instead."
-    )]
     #[wasm_bindgen(method, setter = "challenge")]
     pub fn set_challenge(this: &PublicKeyCredentialCreationOptions, val: &::js_sys::Object);
     #[doc = "Change the `challenge` field of this object."]
@@ -218,6 +215,48 @@ impl PublicKeyCredentialCreationOptions {
         #[allow(unused_mut)]
         let mut ret: Self = ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::new());
         ret.set_challenge(challenge);
+        ret.set_pub_key_cred_params(pub_key_cred_params);
+        ret.set_rp(rp);
+        ret.set_user(user);
+        ret
+    }
+    #[cfg(all(
+        feature = "PublicKeyCredentialRpEntity",
+        feature = "PublicKeyCredentialUserEntity",
+    ))]
+    #[doc = "Construct a new `PublicKeyCredentialCreationOptions`."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `PublicKeyCredentialCreationOptions`, `PublicKeyCredentialRpEntity`, `PublicKeyCredentialUserEntity`*"]
+    pub fn new_with_u8_slice(
+        challenge: &mut [u8],
+        pub_key_cred_params: &::wasm_bindgen::JsValue,
+        rp: &PublicKeyCredentialRpEntity,
+        user: &PublicKeyCredentialUserEntity,
+    ) -> Self {
+        #[allow(unused_mut)]
+        let mut ret: Self = ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::new());
+        ret.set_challenge_u8_slice(challenge);
+        ret.set_pub_key_cred_params(pub_key_cred_params);
+        ret.set_rp(rp);
+        ret.set_user(user);
+        ret
+    }
+    #[cfg(all(
+        feature = "PublicKeyCredentialRpEntity",
+        feature = "PublicKeyCredentialUserEntity",
+    ))]
+    #[doc = "Construct a new `PublicKeyCredentialCreationOptions`."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `PublicKeyCredentialCreationOptions`, `PublicKeyCredentialRpEntity`, `PublicKeyCredentialUserEntity`*"]
+    pub fn new_with_u8_array(
+        challenge: &::js_sys::Uint8Array,
+        pub_key_cred_params: &::wasm_bindgen::JsValue,
+        rp: &PublicKeyCredentialRpEntity,
+        user: &PublicKeyCredentialUserEntity,
+    ) -> Self {
+        #[allow(unused_mut)]
+        let mut ret: Self = ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::new());
+        ret.set_challenge_u8_array(challenge);
         ret.set_pub_key_cred_params(pub_key_cred_params);
         ret.set_rp(rp);
         ret.set_user(user);

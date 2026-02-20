@@ -110,20 +110,8 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    #[deprecated(
-        note = "Use `set_public_key_algorithm_i32()` or `set_public_key_algorithm_f64()` instead."
-    )]
     #[wasm_bindgen(method, setter = "publicKeyAlgorithm")]
-    pub fn set_public_key_algorithm(this: &AuthenticatorAttestationResponseJson, val: f64);
-    #[cfg(web_sys_unstable_apis)]
-    #[doc = "Change the `publicKeyAlgorithm` field of this object."]
-    #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `AuthenticatorAttestationResponseJson`*"]
-    #[doc = ""]
-    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    #[wasm_bindgen(method, setter = "publicKeyAlgorithm")]
-    pub fn set_public_key_algorithm_i32(this: &AuthenticatorAttestationResponseJson, val: i32);
+    pub fn set_public_key_algorithm(this: &AuthenticatorAttestationResponseJson, val: i32);
     #[cfg(web_sys_unstable_apis)]
     #[doc = "Change the `publicKeyAlgorithm` field of this object."]
     #[doc = ""]
@@ -166,7 +154,7 @@ impl AuthenticatorAttestationResponseJson {
         attestation_object: &str,
         authenticator_data: &str,
         client_data_json: &str,
-        public_key_algorithm: f64,
+        public_key_algorithm: i32,
         transports: &[::js_sys::JsString],
     ) -> Self {
         #[allow(unused_mut)]
@@ -175,6 +163,28 @@ impl AuthenticatorAttestationResponseJson {
         ret.set_authenticator_data(authenticator_data);
         ret.set_client_data_json(client_data_json);
         ret.set_public_key_algorithm(public_key_algorithm);
+        ret.set_transports(transports);
+        ret
+    }
+    #[doc = "Construct a new `AuthenticatorAttestationResponseJson`."]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `AuthenticatorAttestationResponseJson`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn new_with_f64(
+        attestation_object: &str,
+        authenticator_data: &str,
+        client_data_json: &str,
+        public_key_algorithm: f64,
+        transports: &[::js_sys::JsString],
+    ) -> Self {
+        #[allow(unused_mut)]
+        let mut ret: Self = ::wasm_bindgen::JsCast::unchecked_into(::js_sys::Object::new());
+        ret.set_attestation_object(attestation_object);
+        ret.set_authenticator_data(authenticator_data);
+        ret.set_client_data_json(client_data_json);
+        ret.set_public_key_algorithm_f64(public_key_algorithm);
         ret.set_transports(transports);
         ret
     }
@@ -204,7 +214,7 @@ impl AuthenticatorAttestationResponseJson {
     }
     #[cfg(web_sys_unstable_apis)]
     #[deprecated = "Use `set_public_key_algorithm()` instead."]
-    pub fn public_key_algorithm(&mut self, val: f64) -> &mut Self {
+    pub fn public_key_algorithm(&mut self, val: i32) -> &mut Self {
         self.set_public_key_algorithm(val);
         self
     }

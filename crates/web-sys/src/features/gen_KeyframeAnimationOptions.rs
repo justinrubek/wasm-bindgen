@@ -68,18 +68,8 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
     #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    #[deprecated(note = "Use `set_duration_f64()` or `set_duration_str()` instead.")]
     #[wasm_bindgen(method, setter = "duration")]
-    pub fn set_duration(this: &KeyframeAnimationOptions, val: &::wasm_bindgen::JsValue);
-    #[cfg(web_sys_unstable_apis)]
-    #[doc = "Change the `duration` field of this object."]
-    #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `KeyframeAnimationOptions`*"]
-    #[doc = ""]
-    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    #[wasm_bindgen(method, setter = "duration")]
-    pub fn set_duration_f64(this: &KeyframeAnimationOptions, val: f64);
+    pub fn set_duration(this: &KeyframeAnimationOptions, val: f64);
     #[cfg(web_sys_unstable_apis)]
     #[doc = "Change the `duration` field of this object."]
     #[doc = ""]
@@ -293,7 +283,7 @@ impl KeyframeAnimationOptions {
     }
     #[cfg(web_sys_unstable_apis)]
     #[deprecated = "Use `set_duration()` instead."]
-    pub fn duration(&mut self, val: &::wasm_bindgen::JsValue) -> &mut Self {
+    pub fn duration(&mut self, val: f64) -> &mut Self {
         self.set_duration(val);
         self
     }
