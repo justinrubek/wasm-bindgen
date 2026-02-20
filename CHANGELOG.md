@@ -91,6 +91,9 @@
 
 ### Fixed
 
+* Fixed incorrect JS export names when LLVM merges identical functions at `opt-level >= 2`.
+  [#4946](https://github.com/wasm-bindgen/wasm-bindgen/issues/4946)
+
 * Added spec-compliant `i32` parameter types for `CanvasRenderingContext2d::get_image_data()`
   and `put_image_data()` (and `OffscreenCanvasRenderingContext2d` equivalents) behind
   `web_sys_unstable_apis`. Per the HTML spec, `getImageData` and `putImageData` use `long`
