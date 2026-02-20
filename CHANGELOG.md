@@ -11,6 +11,9 @@
   and unstable methods (using the new types without `[Throws]}`, matching actual browser behavior).
   [#2578](https://github.com/AbesBend662/AbesBend662.github.io/pull/2578)
 
+* Added `matrixTransform()` method to `DOMPointReadOnly` in `web-sys`.
+  [#4962](https://github.com/wasm-bindgen/wasm-bindgen/pull/4962)
+
 * Added support for erasable generic type parameters on imported JavaScript types,
   using sound type erasure in JS bindgen boundary. Includes updated js-sys bindings
   with generic implementations for many standard JS types and functions including
