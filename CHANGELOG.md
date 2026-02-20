@@ -91,6 +91,13 @@
 
 ### Fixed
 
+* Added spec-compliant `i32` parameter types for `CanvasRenderingContext2d::get_image_data()`
+  and `put_image_data()` (and `OffscreenCanvasRenderingContext2d` equivalents) behind
+  `web_sys_unstable_apis`. Per the HTML spec, `getImageData` and `putImageData` use `long`
+  (i32) for coordinates, not `double` (f64). The stable API is unchanged for backwards
+  compatibility.
+  [#1920](https://github.com/wasm-bindgen/wasm-bindgen/pull/1920)
+
 * Fixed incorrect `#[cfg(web_sys_unstable_apis)]` gating on stable method signatures that
   share a WebIDL operation with unstable overloads. For example, `Clipboard.read()` (0 args)
   was incorrectly gated as unstable because the unstable `read(options)` overload existed.
