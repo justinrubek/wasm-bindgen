@@ -26,8 +26,6 @@ interface HTMLElement : Element {
   //         attribute boolean translate;
   [CEReactions, SetterThrows, Pure]
            attribute DOMString dir;
-  [Constant]
-  readonly attribute DOMStringMap dataset;
 
   [CEReactions, GetterThrows, Pure, TreatNullAs=EmptyString]
            attribute DOMString innerText;
@@ -39,10 +37,8 @@ interface HTMLElement : Element {
            attribute boolean inert;
   [NeedsCallerType]
   undefined click();
-  [CEReactions, SetterThrows, Pure]
-           attribute long tabIndex;
   [Throws]
-  undefined focus();
+  undefined focus(optional FocusOptions options = {});
   [Throws]
   undefined blur();
   [CEReactions, SetterThrows, Pure]
@@ -60,6 +56,8 @@ interface HTMLElement : Element {
   //readonly attribute HTMLMenuElement? contextMenu;
   //[SetterThrows]
   //         attribute HTMLMenuElement? contextMenu;
+  [CEReactions, SetterThrows, Pure, Pref="dom.element.popover.enabled"]
+           attribute DOMString? popover;
   [CEReactions, SetterThrows, Pure]
            attribute boolean spellcheck;
 
@@ -71,9 +69,12 @@ interface HTMLElement : Element {
   //readonly attribute boolean? commandDisabled;
   //readonly attribute boolean? commandChecked;
 
-  // styling
-  [PutForwards=cssText, Constant]
-  readonly attribute CSSStyleDeclaration style;
+  [Throws, Pref="dom.element.popover.enabled"]
+  undefined showPopover(optional ShowPopoverOptions options = {});
+  [Throws, Pref="dom.element.popover.enabled"]
+  undefined hidePopover();
+  [Throws, Pref="dom.element.popover.enabled"]
+  boolean togglePopover(optional boolean force);
 };
 
 // http://dev.w3.org/csswg/cssom-view/#extensions-to-the-htmlelement-interface
@@ -86,6 +87,7 @@ partial interface HTMLElement {
   readonly attribute long offsetHeight;
 };
 
+// https://w3c.github.io/touch-events/#extensions-to-the-globaleventhandlers-mixin
 interface mixin TouchEventHandlers {
   [Func="nsGenericHTMLElement::TouchEventsEnabled"]
            attribute EventHandler ontouchstart;
@@ -97,6 +99,8 @@ interface mixin TouchEventHandlers {
            attribute EventHandler ontouchcancel;
 };
 
+HTMLElement includes HTMLOrSVGElement;
+HTMLElement includes ElementCSSInlineStyle;
 HTMLElement includes GlobalEventHandlers;
 HTMLElement includes DocumentAndElementEventHandlers;
 HTMLElement includes TouchEventHandlers;

@@ -14,7 +14,7 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub type BluetoothRemoteGattCharacteristic;
     #[cfg(web_sys_unstable_apis)]
     #[cfg(feature = "BluetoothRemoteGattService")]
@@ -26,7 +26,7 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`, `BluetoothRemoteGattService`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn service(this: &BluetoothRemoteGattCharacteristic) -> BluetoothRemoteGattService;
     #[cfg(web_sys_unstable_apis)]
     # [wasm_bindgen (structural , method , getter , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = uuid)]
@@ -37,8 +37,8 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    pub fn uuid(this: &BluetoothRemoteGattCharacteristic) -> String;
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn uuid(this: &BluetoothRemoteGattCharacteristic) -> ::alloc::string::String;
     #[cfg(web_sys_unstable_apis)]
     #[cfg(feature = "BluetoothCharacteristicProperties")]
     # [wasm_bindgen (structural , method , getter , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = properties)]
@@ -49,7 +49,7 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothCharacteristicProperties`, `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn properties(
         this: &BluetoothRemoteGattCharacteristic,
     ) -> BluetoothCharacteristicProperties;
@@ -62,7 +62,7 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn value(this: &BluetoothRemoteGattCharacteristic) -> Option<::js_sys::DataView>;
     #[cfg(web_sys_unstable_apis)]
     # [wasm_bindgen (structural , method , getter , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = oncharacteristicvaluechanged)]
@@ -73,7 +73,7 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn oncharacteristicvaluechanged(
         this: &BluetoothRemoteGattCharacteristic,
     ) -> Option<::js_sys::Function>;
@@ -86,78 +86,85 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn set_oncharacteristicvaluechanged(
         this: &BluetoothRemoteGattCharacteristic,
         value: Option<&::js_sys::Function>,
     );
     #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "BluetoothRemoteGattDescriptor")]
     # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = getDescriptor)]
     #[doc = "The `getDescriptor()` method."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/getDescriptor)"]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
+    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`, `BluetoothRemoteGattDescriptor`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn get_descriptor_with_str(
         this: &BluetoothRemoteGattCharacteristic,
         descriptor: &str,
-    ) -> ::js_sys::Promise;
+    ) -> ::js_sys::Promise<BluetoothRemoteGattDescriptor>;
     #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "BluetoothRemoteGattDescriptor")]
     # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = getDescriptor)]
     #[doc = "The `getDescriptor()` method."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/getDescriptor)"]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
+    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`, `BluetoothRemoteGattDescriptor`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn get_descriptor_with_u32(
         this: &BluetoothRemoteGattCharacteristic,
         descriptor: u32,
-    ) -> ::js_sys::Promise;
+    ) -> ::js_sys::Promise<BluetoothRemoteGattDescriptor>;
     #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "BluetoothRemoteGattDescriptor")]
     # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = getDescriptors)]
     #[doc = "The `getDescriptors()` method."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/getDescriptors)"]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
+    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`, `BluetoothRemoteGattDescriptor`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    pub fn get_descriptors(this: &BluetoothRemoteGattCharacteristic) -> ::js_sys::Promise;
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn get_descriptors(
+        this: &BluetoothRemoteGattCharacteristic,
+    ) -> ::js_sys::Promise<::js_sys::Array<BluetoothRemoteGattDescriptor>>;
     #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "BluetoothRemoteGattDescriptor")]
     # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = getDescriptors)]
     #[doc = "The `getDescriptors()` method."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/getDescriptors)"]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
+    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`, `BluetoothRemoteGattDescriptor`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn get_descriptors_with_str(
         this: &BluetoothRemoteGattCharacteristic,
         descriptor: &str,
-    ) -> ::js_sys::Promise;
+    ) -> ::js_sys::Promise<::js_sys::Array<BluetoothRemoteGattDescriptor>>;
     #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "BluetoothRemoteGattDescriptor")]
     # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = getDescriptors)]
     #[doc = "The `getDescriptors()` method."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/getDescriptors)"]
     #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
+    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`, `BluetoothRemoteGattDescriptor`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn get_descriptors_with_u32(
         this: &BluetoothRemoteGattCharacteristic,
         descriptor: u32,
-    ) -> ::js_sys::Promise;
+    ) -> ::js_sys::Promise<::js_sys::Array<BluetoothRemoteGattDescriptor>>;
     #[cfg(web_sys_unstable_apis)]
     # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = readValue)]
     #[doc = "The `readValue()` method."]
@@ -167,8 +174,10 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    pub fn read_value(this: &BluetoothRemoteGattCharacteristic) -> ::js_sys::Promise;
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn read_value(
+        this: &BluetoothRemoteGattCharacteristic,
+    ) -> ::js_sys::Promise<::js_sys::DataView>;
     #[cfg(web_sys_unstable_apis)]
     # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = startNotifications)]
     #[doc = "The `startNotifications()` method."]
@@ -178,8 +187,10 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    pub fn start_notifications(this: &BluetoothRemoteGattCharacteristic) -> ::js_sys::Promise;
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn start_notifications(
+        this: &BluetoothRemoteGattCharacteristic,
+    ) -> ::js_sys::Promise<BluetoothRemoteGattCharacteristic>;
     #[cfg(web_sys_unstable_apis)]
     # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = stopNotifications)]
     #[doc = "The `stopNotifications()` method."]
@@ -189,10 +200,12 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    pub fn stop_notifications(this: &BluetoothRemoteGattCharacteristic) -> ::js_sys::Promise;
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn stop_notifications(
+        this: &BluetoothRemoteGattCharacteristic,
+    ) -> ::js_sys::Promise<BluetoothRemoteGattCharacteristic>;
     #[cfg(web_sys_unstable_apis)]
-    # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValue)]
+    # [wasm_bindgen (catch , method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValue)]
     #[doc = "The `writeValue()` method."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/writeValue)"]
@@ -200,13 +213,13 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn write_value_with_buffer_source(
         this: &BluetoothRemoteGattCharacteristic,
         value: &::js_sys::Object,
-    ) -> ::js_sys::Promise;
+    ) -> Result<::js_sys::Promise<::js_sys::Undefined>, JsValue>;
     #[cfg(web_sys_unstable_apis)]
-    # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValue)]
+    # [wasm_bindgen (catch , method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValue)]
     #[doc = "The `writeValue()` method."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/writeValue)"]
@@ -214,13 +227,27 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    pub fn write_value_with_u8_array(
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn write_value_with_u8_slice(
         this: &BluetoothRemoteGattCharacteristic,
         value: &mut [u8],
-    ) -> ::js_sys::Promise;
+    ) -> Result<::js_sys::Promise<::js_sys::Undefined>, JsValue>;
     #[cfg(web_sys_unstable_apis)]
-    # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValueWithResponse)]
+    # [wasm_bindgen (catch , method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValue)]
+    #[doc = "The `writeValue()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/writeValue)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn write_value_with_u8_array(
+        this: &BluetoothRemoteGattCharacteristic,
+        value: &::js_sys::Uint8Array,
+    ) -> Result<::js_sys::Promise<::js_sys::Undefined>, JsValue>;
+    #[cfg(web_sys_unstable_apis)]
+    # [wasm_bindgen (catch , method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValueWithResponse)]
     #[doc = "The `writeValueWithResponse()` method."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/writeValueWithResponse)"]
@@ -228,13 +255,13 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn write_value_with_response_with_buffer_source(
         this: &BluetoothRemoteGattCharacteristic,
         value: &::js_sys::Object,
-    ) -> ::js_sys::Promise;
+    ) -> Result<::js_sys::Promise<::js_sys::Undefined>, JsValue>;
     #[cfg(web_sys_unstable_apis)]
-    # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValueWithResponse)]
+    # [wasm_bindgen (catch , method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValueWithResponse)]
     #[doc = "The `writeValueWithResponse()` method."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/writeValueWithResponse)"]
@@ -242,13 +269,27 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    pub fn write_value_with_response_with_u8_array(
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn write_value_with_response_with_u8_slice(
         this: &BluetoothRemoteGattCharacteristic,
         value: &mut [u8],
-    ) -> ::js_sys::Promise;
+    ) -> Result<::js_sys::Promise<::js_sys::Undefined>, JsValue>;
     #[cfg(web_sys_unstable_apis)]
-    # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValueWithoutResponse)]
+    # [wasm_bindgen (catch , method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValueWithResponse)]
+    #[doc = "The `writeValueWithResponse()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/writeValueWithResponse)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn write_value_with_response_with_u8_array(
+        this: &BluetoothRemoteGattCharacteristic,
+        value: &::js_sys::Uint8Array,
+    ) -> Result<::js_sys::Promise<::js_sys::Undefined>, JsValue>;
+    #[cfg(web_sys_unstable_apis)]
+    # [wasm_bindgen (catch , method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValueWithoutResponse)]
     #[doc = "The `writeValueWithoutResponse()` method."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/writeValueWithoutResponse)"]
@@ -256,13 +297,13 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn write_value_without_response_with_buffer_source(
         this: &BluetoothRemoteGattCharacteristic,
         value: &::js_sys::Object,
-    ) -> ::js_sys::Promise;
+    ) -> Result<::js_sys::Promise<::js_sys::Undefined>, JsValue>;
     #[cfg(web_sys_unstable_apis)]
-    # [wasm_bindgen (method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValueWithoutResponse)]
+    # [wasm_bindgen (catch , method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValueWithoutResponse)]
     #[doc = "The `writeValueWithoutResponse()` method."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/writeValueWithoutResponse)"]
@@ -270,9 +311,23 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    pub fn write_value_without_response_with_u8_array(
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn write_value_without_response_with_u8_slice(
         this: &BluetoothRemoteGattCharacteristic,
         value: &mut [u8],
-    ) -> ::js_sys::Promise;
+    ) -> Result<::js_sys::Promise<::js_sys::Undefined>, JsValue>;
+    #[cfg(web_sys_unstable_apis)]
+    # [wasm_bindgen (catch , method , structural , js_class = "BluetoothRemoteGATTCharacteristic" , js_name = writeValueWithoutResponse)]
+    #[doc = "The `writeValueWithoutResponse()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/BluetoothRemoteGATTCharacteristic/writeValueWithoutResponse)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `BluetoothRemoteGattCharacteristic`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn write_value_without_response_with_u8_array(
+        this: &BluetoothRemoteGattCharacteristic,
+        value: &::js_sys::Uint8Array,
+    ) -> Result<::js_sys::Promise<::js_sys::Undefined>, JsValue>;
 }

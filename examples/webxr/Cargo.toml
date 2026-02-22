@@ -1,21 +1,21 @@
 [package]
-name = "webxr"
-version = "0.1.0"
 authors = ["The wasm-bindgen Developers"]
-edition = "2018"
-rust-version = "1.57"
+edition = "2021"
+name = "webxr"
+publish = false
+version = "0.0.0"
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
+console_error_panic_hook = { version = "0.1.6", optional = true }
 futures = "0.3.4"
-js-sys = "0.3.69"
-wasm-bindgen = "0.2.92"
-wasm-bindgen-futures = "0.4.42"
+js-sys = { path = "../../crates/js-sys" }
+wasm-bindgen = { path = "../../" }
+wasm-bindgen-futures = { path = "../../crates/futures" }
 
 [dependencies.web-sys]
-version = "0.3.37"
 features = [
   'Document',
   'Element',
@@ -62,5 +62,16 @@ features = [
   'XrWebGlLayer',
   'XrWebGlLayerInit',
   'XrSystem',
-  'console'
+  'console',
 ]
+path = "../../crates/web-sys"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(web_sys_unstable_apis)'] }
+
+[lints.clippy]
+large_enum_variant = "allow"
+new_without_default = "allow"
+overly_complex_bool_expr = "allow"
+too_many_arguments = "allow"
+type_complexity = "allow"

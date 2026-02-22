@@ -1,9 +1,9 @@
-# Small wasm files
+# Small Wasm files
 
 [View full source code][code] or [view the compiled example online][online]
 
-[online]: https://rustwasm.github.io/wasm-bindgen/exbuild/add/
-[code]: https://github.com/rustwasm/wasm-bindgen/tree/master/examples/add
+[online]: https://wasm-bindgen.github.io/wasm-bindgen/exbuild/add/
+[code]: https://github.com/wasm-bindgen/wasm-bindgen/tree/master/examples/add
 
 One of `wasm-bindgen`'s core goals is a pay-only-for-what-you-use philosophy, so
 if we don't use much then we shouldn't be paying much! As a result
@@ -15,7 +15,7 @@ Currently this code...
 {{#include ../../../examples/add/src/lib.rs}}
 ```
 
-generates a 710 byte wasm binary:
+generates a 710 byte Wasm binary:
 
 ```
 $ ls -l add_bg.wasm

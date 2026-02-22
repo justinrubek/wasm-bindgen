@@ -20,7 +20,7 @@ extern "C" {
     fn _12_js(rules: Rules) -> Rules;
     fn _13_js(rules: Rules) -> Rules;
 
-    fn raw_identifer(rules: RulesWithRawField) -> RulesWithRawField;
+    fn raw_identifier(rules: RulesWithRawField) -> RulesWithRawField;
 
     fn test_getter_compute(x: GetterCompute);
     fn test_setter_compute(x: SetterCompute);
@@ -28,7 +28,7 @@ extern "C" {
 }
 
 // Each getter/setter combination is derived
-// from https://github.com/rustwasm/wasm-bindgen/pull/1440#issuecomment-487113564
+// from https://github.com/wasm-bindgen/wasm-bindgen/pull/1440#issuecomment-487113564
 #[wasm_bindgen]
 pub struct Rules {
     pub field: i32,

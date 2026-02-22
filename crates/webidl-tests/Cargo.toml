@@ -1,22 +1,22 @@
 [package]
-name = "webidl-tests"
-version = "0.1.0"
 authors = ["The wasm-bindgen Developers"]
-edition = "2018"
+edition = "2021"
+name = "webidl-tests"
 publish = false
-rust-version = "1.57"
+version = "0.0.0"
 
 [lib]
-test = false
 doctest = false
 path = 'lib.rs'
+test = false
 
 [dependencies]
-js-sys = { path = '../js-sys' }
-wasm-bindgen-futures = { path = '../futures' }
+js-sys = { path = '../js-sys', features = ["unsafe-eval"] }
 wasm-bindgen = { path = '../..' }
+wasm-bindgen-futures = { path = '../futures' }
 
 [build-dependencies]
+env_logger = "0.11"
 wasm-bindgen-webidl = { path = "../webidl" }
 
 [dev-dependencies]
@@ -25,3 +25,9 @@ wasm-bindgen-test = { path = '../test' }
 [[test]]
 name = 'wasm'
 path = 'main.rs'
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(web_sys_unstable_apis)',
+  'cfg(wbg_next_unstable)',
+] }

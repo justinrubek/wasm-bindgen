@@ -178,7 +178,10 @@ enum ScrollLogicalPosition { "start", "center", "end", "nearest" };
 dictionary ScrollIntoViewOptions : ScrollOptions {
   ScrollLogicalPosition block = "start";
   ScrollLogicalPosition inline = "nearest";
+  ScrollIntoViewContainer container = "all";
 };
+
+enum ScrollIntoViewContainer { "all", "nearest" };
 
 // http://dev.w3.org/csswg/cssom-view/#extensions-to-the-element-interface
 partial interface Element {
@@ -262,4 +265,21 @@ partial interface Element {
 partial interface Element {
   [NeedsCallerType]
   undefined requestPointerLock();
+};
+
+// https://html.spec.whatwg.org/#htmlorsvgelement
+interface mixin HTMLOrSVGElement {
+  [SameObject] readonly attribute DOMStringMap dataset;
+
+  attribute DOMString nonce; // intentionally no [CEReactions]
+  [CEReactions, SetterThrows] attribute boolean autofocus;
+  [CEReactions, SetterThrows] attribute long tabIndex;
+  [Throws] undefined focus(optional FocusOptions options = {});
+  [Throws] undefined blur();
+};
+
+// https://drafts.csswg.org/cssom/#the-elementcssinlinestyle-mixin
+interface mixin ElementCSSInlineStyle {
+  [SameObject, PutForwards=cssText]
+  readonly attribute CSSStyleDeclaration style;
 };

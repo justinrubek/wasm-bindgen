@@ -1,19 +1,22 @@
 use crate::descriptor::VectorKind;
-use crate::wit::{AuxImport, WasmBindgenAux};
 use std::borrow::Cow;
-use std::collections::{HashMap, HashSet};
-use walrus::{FunctionId, ImportId, TypedCustomSectionId};
+use std::collections::{BTreeMap, HashSet};
+use walrus::{ExportId, FunctionId, ImportId, RefType, TypedCustomSectionId};
 
 #[derive(Default, Debug)]
 pub struct NonstandardWitSection {
     /// A list of adapter functions, keyed by their id.
-    pub adapters: HashMap<AdapterId, Adapter>,
+    ///
+    /// This map is iterated over in multiple places, so we use an ordered map
+    /// to ensure that the order of iteration is deterministic. This map affects
+    /// all parts of the generated code, so it's important to get this right.
+    pub adapters: BTreeMap<AdapterId, Adapter>,
 
-    /// A list of pairs for adapter functions that implement core wasm imports.
+    /// A list of pairs for adapter functions that implement core Wasm imports.
     pub implements: Vec<(ImportId, FunctionId, AdapterId)>,
 
     /// A list of adapter functions and the names they're exported under.
-    pub exports: Vec<(String, AdapterId)>,
+    pub exports: Vec<(ExportId, AdapterId)>,
 }
 
 pub type NonstandardWitSectionId = TypedCustomSectionId<NonstandardWitSection>;
@@ -36,7 +39,6 @@ pub enum AdapterKind {
         instructions: Vec<InstructionData>,
     },
     Import {
-        module: String,
         name: String,
         kind: AdapterJsImportKind,
     },
@@ -71,10 +73,12 @@ pub enum AdapterType {
     S16,
     S32,
     S64,
+    S128,
     U8,
     U16,
     U32,
     U64,
+    U128,
     F32,
     F64,
     String,
@@ -86,15 +90,28 @@ pub enum AdapterType {
     Option(Box<AdapterType>),
     Struct(String),
     Enum(String),
+    StringEnum(String),
     NamedExternref(String),
     Function,
     NonNull,
 }
 
+/// Describes how a closure's lifetime is managed.
+#[derive(Debug, Clone)]
+pub enum ClosureDtor {
+    /// Persistent/owned closure with a destructor function that will be called
+    /// when the closure is dropped on the JS side.
+    OwnClosure(walrus::ExportId),
+    /// Borrowed closure called from JS (e.g., `forEach` callback). The closure
+    /// is invalidated after the JS call returns by calling `_wbg_cb_unref`.
+    Immediate,
+    /// Borrowed closure (`ScopedClosure`) passed to a Rust async import. The closure's lifetime
+    /// is tied to the async call and cleanup is handled on the Rust side.
+    Borrowed,
+}
+
 #[derive(Debug, Clone)]
 pub enum Instruction {
-    /// Calls a function by its id.
-    CallCore(walrus::FunctionId),
     /// Call the deallocation function.
     DeferFree {
         free: walrus::FunctionId,
@@ -105,8 +122,6 @@ pub enum Instruction {
     CallAdapter(AdapterId),
     /// Call an exported function in the core module
     CallExport(walrus::ExportId),
-    /// Call an element in the function table of the core module
-    CallTableElement(u32),
 
     /// Gets an argument by its index.
     ArgGet(u32),
@@ -129,15 +144,52 @@ pub enum Instruction {
         size: u32,
     },
 
-    /// Pops a typed integer (`u8`, `s16`, etc.) and pushes a plain wasm `i32` or `i64` equivalent.
-    IntToWasm {
-        input: AdapterType,
-        output: walrus::ValType,
+    /// Pops a 32/16/8-bit integer (`u8`, `s16`, etc.) and pushes a Wasm `i32`.
+    Int32ToWasm,
+    /// Pops a Wasm `i32` and pushes a 32-bit integer.
+    WasmToInt32 {
+        /// Whether the integer represents an unsigned 32-bit value.
+        unsigned_32: bool,
     },
-    /// Pops a wasm `i32` or `i64` and pushes a typed integer (`u8`, `s16`, etc.) equivalent.
-    WasmToInt {
-        input: walrus::ValType,
-        output: AdapterType,
+
+    /// Pops a 64-bit integer and pushes a Wasm `i64`.
+    Int64ToWasm,
+    /// Pops a Wasm `i64` and pushes a 64-bit integer.
+    WasmToInt64 {
+        unsigned: bool,
+    },
+
+    /// Pops a 128-bit integer and pushes 2 Wasm 64-bit ints.
+    Int128ToWasm,
+    /// Pops 2 Wasm 64-bit ints and pushes a 128-bit integer.
+    WasmToInt128 {
+        signed: bool,
+    },
+
+    OptionInt128ToWasm,
+    OptionWasmToInt128 {
+        signed: bool,
+    },
+
+    /// Pops a Wasm `i32` and pushes the enum variant as a string
+    WasmToStringEnum {
+        name: String,
+    },
+
+    OptionWasmToStringEnum {
+        name: String,
+    },
+
+    /// pops a string and pushes the enum variant as an `i32`
+    StringEnumToWasm {
+        name: String,
+        invalid: u32,
+    },
+
+    OptionStringEnumToWasm {
+        name: String,
+        invalid: u32,
+        hole: u32,
     },
 
     /// Pops a `bool` from the stack and pushes an `i32` equivalent
@@ -147,7 +199,7 @@ pub enum Instruction {
     /// Pops an `externref` from the stack, allocates space in the externref table,
     /// returns the index it was stored at.
     I32FromExternrefOwned,
-    /// Pops an `externref` from the stack, pushes it onto the externref wasm table
+    /// Pops an `externref` from the stack, pushes it onto the externref Wasm table
     /// stack, and returns the index it was stored at.
     I32FromExternrefBorrow,
     /// Pops an `externref` from the stack, assumes it's a Rust class given, and
@@ -167,7 +219,7 @@ pub enum Instruction {
         class: String,
     },
     /// Pops an `externref` from the stack, pushes either 0 if it's "none" or and
-    /// index into the owned wasm table it was stored at if it's "some"
+    /// index into the owned Wasm table it was stored at if it's "some"
     I32FromOptionExternref {
         /// Set to `Some` by the externref pass of where to put it in the wasm
         /// module, otherwise it's shoved into the JS shim.
@@ -187,6 +239,14 @@ pub enum Instruction {
     I32FromOptionEnum {
         hole: u32,
     },
+    /// Pops an `externref` from the stack, pushes either a sentinel value if it's
+    /// "none" or the integer value of it if it's "some"
+    F64FromOptionSentinelInt {
+        signed: bool,
+    },
+    /// Pops an `externref` from the stack, pushes either a sentinel value if it's
+    /// "none" or the f32 value of it if it's "some"
+    F64FromOptionSentinelF32,
     /// Pops any externref from the stack and then pushes two values. First is a
     /// 0/1 if it's none/some and second is `ty` value if it was there or 0 if
     /// it wasn't there.
@@ -261,7 +321,6 @@ pub enum Instruction {
     /// pops ptr/length i32, loads string from cache
     CachedStringLoad {
         owned: bool,
-        optional: bool,
         mem: walrus::MemoryId,
         free: walrus::FunctionId,
         /// If we're in reference-types mode, the externref table ID to get the cached string from.
@@ -282,10 +341,11 @@ pub enum Instruction {
     /// pops i32, loads externref from externref table
     TableGet,
     /// pops two i32 data pointers, pushes an externref closure
-    StackClosure {
+    Closure {
         adapter: AdapterId,
         nargs: usize,
         mutable: bool,
+        dtor: ClosureDtor,
     },
     /// pops two i32 data pointers, pushes a vector view
     View {
@@ -297,6 +357,8 @@ pub enum Instruction {
         kind: VectorKind,
         mem: walrus::MemoryId,
     },
+    /// pops f64, pushes it viewed as an optional value with a known sentinel
+    OptionF64Sentinel,
     /// pops i32, pushes it viewed as an optional value with a known sentinel
     OptionU32Sentinel,
     /// pops an i32, then `ty`, then pushes externref
@@ -321,8 +383,8 @@ impl AdapterType {
             walrus::ValType::I64 => AdapterType::I64,
             walrus::ValType::F32 => AdapterType::F32,
             walrus::ValType::F64 => AdapterType::F64,
-            walrus::ValType::Externref => AdapterType::Externref,
-            walrus::ValType::Funcref | walrus::ValType::V128 => return None,
+            walrus::ValType::Ref(RefType::EXTERNREF) => AdapterType::Externref,
+            walrus::ValType::Ref(_) | walrus::ValType::V128 => return None,
         })
     }
 
@@ -333,7 +395,9 @@ impl AdapterType {
             AdapterType::F32 => walrus::ValType::F32,
             AdapterType::F64 => walrus::ValType::F64,
             AdapterType::Enum(_) => walrus::ValType::I32,
-            AdapterType::Externref | AdapterType::NamedExternref(_) => walrus::ValType::Externref,
+            AdapterType::Externref | AdapterType::NamedExternref(_) => {
+                walrus::ValType::Ref(RefType::EXTERNREF)
+            }
             _ => return None,
         })
     }
@@ -370,7 +434,7 @@ impl NonstandardWitSection {
     ///
     /// Returns `true` if any adapters were deleted, or `false` if the adapters
     /// did not change.
-    pub fn gc(&mut self, aux: &WasmBindgenAux) -> bool {
+    pub fn gc(&mut self) -> bool {
         // Populate the live set with the exports, implements directives, and
         // anything transitively referenced by those adapters.
         let mut live = HashSet::new();
@@ -379,11 +443,6 @@ impl NonstandardWitSection {
         }
         for (_, _, id) in self.implements.iter() {
             self.add_live(*id, &mut live);
-        }
-        for import in aux.import_map.values() {
-            if let AuxImport::Closure { adapter, .. } = import {
-                self.add_live(*adapter, &mut live);
-            }
         }
 
         // And now that we have the live set we can filter out our list of
@@ -403,7 +462,7 @@ impl NonstandardWitSection {
         };
         for instr in instructions {
             match instr.instr {
-                Instruction::StackClosure { adapter, .. } | Instruction::CallAdapter(adapter) => {
+                Instruction::Closure { adapter, .. } | Instruction::CallAdapter(adapter) => {
                     self.add_live(adapter, live);
                 }
                 _ => {}
@@ -417,7 +476,7 @@ impl walrus::CustomSection for NonstandardWitSection {
         "nonstandard wit section"
     }
 
-    fn data(&self, _: &walrus::IdsToIndices) -> Cow<[u8]> {
+    fn data(&self, _: &walrus::IdsToIndices) -> Cow<'_, [u8]> {
         panic!("shouldn't emit custom sections just yet");
     }
 
@@ -431,7 +490,7 @@ impl walrus::CustomSection for NonstandardWitSection {
             };
             for instr in instrs {
                 match instr.instr {
-                    DeferFree { free: f, .. } | CallCore(f) => {
+                    DeferFree { free: f, .. } => {
                         roots.push_func(f);
                     }
                     StoreRetptr { mem, .. }

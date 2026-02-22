@@ -1,11 +1,9 @@
-let wasm;
-export function __wbg_set_wasm(val) {
-    wasm = val;
-}
+/* @ts-self-types="./reference_test.d.ts" */
 
-/**
-*/
-export function nop() {
-    wasm.nop();
-}
-
+import * as wasm from "./reference_test_bg.wasm";
+import { __wbg_set_wasm } from "./reference_test_bg.js";
+__wbg_set_wasm(wasm);
+wasm.__wbindgen_start();
+export {
+    nop
+} from "./reference_test_bg.js";

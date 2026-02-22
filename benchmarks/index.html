@@ -22,7 +22,7 @@ table td {
     <script src='index.js' type=module async></script>
   </head>
   <body>
-    <a href='https://github.com/rustwasm/wasm-bindgen/tree/main/benchmarks'>Source code</a>
+    <a href='https://github.com/wasm-bindgen/wasm-bindgen/tree/main/benchmarks'>Source code</a>
 
     <h1>JS / wasm-bindgen comparison</h1>
 
@@ -56,7 +56,7 @@ table td {
             <p class='about'>
               This benchmarks tests out how long it take JS to call a thunk in
               the given language. For example JS will call a JS thunk or
-              JS will call a wasm function that does nothing.
+              JS will call a Wasm function that does nothing.
             </p>
           </td>
 
@@ -131,7 +131,7 @@ table td {
 
             <p class='about'>
               This benchmarks calculates the 40th fibonacci number. It in
-              theory should favor wasm since wasm is "better a compute", but
+              theory should favor Wasm since Wasm is "better a compute", but
               a good JIT will probably make the code roughly equivalent.
             </p>
           </td>
@@ -275,6 +275,20 @@ table td {
           <td class='bm' id='wbindgen_call_foo_bar_structural_n_times'></td>
         </tr>
 
+        <tr>
+          <td>
+            Call a custom JS function with a string enum value parameter
+
+            <a class='about-open' href='#'>(?)</a>
+
+            <p class='about'>
+              Benchmarks the speed of passing string enums to javascript
+            </p>
+          </td>
+
+          <td class='bm' id='wbindgen_call_use_baz_n_times'></td>
+        </tr>
+
         <tr style='display:none' class='str-benchmark'>
           <td>
             Pass <span class='str'></span> to/from wasm-bindgen
@@ -282,7 +296,7 @@ table td {
             <a class='about-open' href='#'>(?)</a>
 
             <p class='about'>
-              This benchmarks the overhead of passing strings to wasm and
+              This benchmarks the overhead of passing strings to Wasm and
               also receiving them from wasm.
             </p>
           </td>

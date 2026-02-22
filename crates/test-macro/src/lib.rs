@@ -4,17 +4,29 @@
 extern crate proc_macro;
 
 use proc_macro2::*;
-use quote::format_ident;
 use quote::quote;
 use quote::quote_spanned;
-use std::sync::atomic::*;
 
-static CNT: AtomicUsize = AtomicUsize::new(0);
+#[proc_macro_attribute]
+pub fn wasm_bindgen_bench(
+    attr: proc_macro::TokenStream,
+    body: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+    bindgen(attr, body, true)
+}
 
 #[proc_macro_attribute]
 pub fn wasm_bindgen_test(
     attr: proc_macro::TokenStream,
     body: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+    bindgen(attr, body, false)
+}
+
+fn bindgen(
+    attr: proc_macro::TokenStream,
+    body: proc_macro::TokenStream,
+    is_bench: bool,
 ) -> proc_macro::TokenStream {
     let mut attributes = Attributes::default();
     let attribute_parser = syn::meta::parser(|meta| attributes.parse(meta));
@@ -72,7 +84,7 @@ pub fn wasm_bindgen_test(
 
     let mut tokens = Vec::<TokenTree>::new();
 
-    let should_panic = match should_panic {
+    let should_panic_par = match &should_panic {
         Some(Some(lit)) => {
             quote! { ::core::option::Option::Some(::core::option::Option::Some(#lit)) }
         }
@@ -80,7 +92,7 @@ pub fn wasm_bindgen_test(
         None => quote! { ::core::option::Option::None },
     };
 
-    let ignore = match ignore {
+    let ignore_par = match &ignore {
         Some(Some(lit)) => {
             quote! { ::core::option::Option::Some(::core::option::Option::Some(#lit)) }
         }
@@ -88,26 +100,83 @@ pub fn wasm_bindgen_test(
         None => quote! { ::core::option::Option::None },
     };
 
-    let test_body = if attributes.r#async {
-        quote! { cx.execute_async(test_name, #ident, #should_panic, #ignore); }
+    let exec_ident = if is_bench {
+        let body = if attributes.r#async {
+            quote! { #ident(&mut bencher).await; }
+        } else {
+            quote! { #ident(&mut bencher); }
+        };
+        let bench_ident = quote::format_ident!("__wbg_bench_{ident}");
+        tokens.extend(quote! {
+            async fn #bench_ident() {
+                let mut bencher = Criterion::default()
+                    .with_location(file!(), module_path!());
+                #body
+            }
+        });
+        bench_ident
     } else {
-        quote! { cx.execute_sync(test_name, #ident, #should_panic, #ignore); }
+        ident.clone()
     };
 
-    // We generate a `#[no_mangle]` with a known prefix so the test harness can
-    // later slurp up all of these functions and pass them as arguments to the
-    // main test harness. This is the entry point for all tests.
-    let name = format_ident!("__wbgt_{}_{}", ident, CNT.fetch_add(1, Ordering::SeqCst));
+    let test_body = if attributes.r#async || is_bench {
+        quote! { cx.execute_async(test_name, #exec_ident, #should_panic_par, #ignore_par); }
+    } else {
+        quote! { cx.execute_sync(test_name, #exec_ident, #should_panic_par, #ignore_par); }
+    };
+
+    let ignore_name = if ignore.is_some() { "$" } else { "" };
+
     let wasm_bindgen_path = attributes.wasm_bindgen_path;
+    let prefix = if is_bench { "__wbgb_" } else { "__wbgt_" };
     tokens.extend(
         quote! {
-            #[no_mangle]
-            pub extern "C" fn #name(cx: &#wasm_bindgen_path::__rt::Context) {
-                let test_name = ::core::concat!(::core::module_path!(), "::", ::core::stringify!(#ident));
-                #test_body
-            }
+            const _: () = {
+                #wasm_bindgen_path::__rt::wasm_bindgen::__wbindgen_coverage! {
+                #[export_name = ::core::concat!(#prefix, #ignore_name, "_", ::core::module_path!(), "::", ::core::stringify!(#ident))]
+                #[cfg(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none")))]
+                extern "C" fn __wbgt_test(cx: &#wasm_bindgen_path::__rt::Context) {
+                    let test_name = ::core::concat!(::core::module_path!(), "::", ::core::stringify!(#ident));
+                    #test_body
+                }
+                }
+            };
         },
     );
+
+    if let Some(path) = attributes.unsupported {
+        tokens.extend(
+            quote! { #[cfg_attr(not(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none"))), #path)] },
+        );
+
+        if let Some(should_panic) = should_panic {
+            let should_panic = if let Some(lit) = should_panic {
+                quote! { should_panic = #lit }
+            } else {
+                quote! { should_panic }
+            };
+
+            tokens.extend(
+                quote! { #[cfg_attr(not(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none"))), #should_panic)] }
+            )
+        }
+
+        if let Some(ignore) = ignore {
+            let ignore = if let Some(lit) = ignore {
+                quote! { ignore = #lit }
+            } else {
+                quote! { ignore }
+            };
+
+            tokens.extend(
+                quote! { #[cfg_attr(not(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none"))), #ignore)] }
+            )
+        }
+    } else {
+        tokens.extend(quote! {
+            #[cfg_attr(not(all(target_arch = "wasm32", any(target_os = "unknown", target_os = "none"))), allow(dead_code))]
+        });
+    }
 
     tokens.extend(leading_tokens);
     tokens.push(ident.into());
@@ -270,6 +339,7 @@ fn compile_error(span: Span, msg: &str) -> proc_macro::TokenStream {
 struct Attributes {
     r#async: bool,
     wasm_bindgen_path: syn::Path,
+    unsupported: Option<syn::Meta>,
 }
 
 impl Default for Attributes {
@@ -277,6 +347,7 @@ impl Default for Attributes {
         Self {
             r#async: false,
             wasm_bindgen_path: syn::parse_quote!(::wasm_bindgen_test),
+            unsupported: None,
         }
     }
 }
@@ -287,6 +358,8 @@ impl Attributes {
             self.r#async = true;
         } else if meta.path.is_ident("crate") {
             self.wasm_bindgen_path = meta.value()?.parse::<syn::Path>()?;
+        } else if meta.path.is_ident("unsupported") {
+            self.unsupported = Some(meta.value()?.parse::<syn::Meta>()?);
         } else {
             return Err(meta.error("unknown attribute"));
         }

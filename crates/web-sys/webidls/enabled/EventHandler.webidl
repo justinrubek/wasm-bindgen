@@ -29,8 +29,10 @@ interface mixin GlobalEventHandlers {
 // below.
 //         attribute OnErrorEventHandler onerror;
            attribute EventHandler onfocus;
-           //(Not implemented)attribute EventHandler oncancel;
+           attribute EventHandler oncancel;
            attribute EventHandler onauxclick;
+           [Pref="dom.element.popover.enabled"]
+           attribute EventHandler onbeforetoggle;
            attribute EventHandler oncanplay;
            attribute EventHandler oncanplaythrough;
            attribute EventHandler onchange;
@@ -51,6 +53,8 @@ interface mixin GlobalEventHandlers {
            attribute EventHandler onemptied;
            attribute EventHandler onended;
            attribute EventHandler oninput;
+  [Pref="dom.input_events.beforeinput.enabled"]
+           attribute EventHandler onbeforeinput;
            attribute EventHandler oninvalid;
            attribute EventHandler onkeydown;
            attribute EventHandler onkeypress;

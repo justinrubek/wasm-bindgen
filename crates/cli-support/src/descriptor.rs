@@ -1,47 +1,7 @@
 use std::char;
 
-macro_rules! tys {
-    ($($a:ident)*) => (tys! { @ ($($a)*) 0 });
-    (@ () $v:expr) => {};
-    (@ ($a:ident $($b:ident)*) $v:expr) => {
-        const $a: u32 = $v;
-        tys!(@ ($($b)*) $v+1);
-    }
-}
-
-// NB: this list must be kept in sync with `src/describe.rs`
-tys! {
-    I8
-    U8
-    I16
-    U16
-    I32
-    U32
-    I64
-    U64
-    F32
-    F64
-    BOOLEAN
-    FUNCTION
-    CLOSURE
-    CACHED_STRING
-    STRING
-    REF
-    REFMUT
-    LONGREF
-    SLICE
-    VECTOR
-    EXTERNREF
-    NAMED_EXTERNREF
-    ENUM
-    RUST_STRUCT
-    CHAR
-    OPTIONAL
-    RESULT
-    UNIT
-    CLAMPED
-    NONNULL
-}
+use wasm_bindgen_shared::identifier::is_valid_ident;
+use wasm_bindgen_shared::tys::*;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Descriptor {
@@ -54,6 +14,8 @@ pub enum Descriptor {
     U32,
     I64,
     U64,
+    I128,
+    U128,
     F32,
     F64,
     Boolean,
@@ -67,7 +29,15 @@ pub enum Descriptor {
     String,
     Externref,
     NamedExternref(String),
-    Enum { name: String, hole: u32 },
+    Enum {
+        name: String,
+        hole: u32,
+    },
+    StringEnum {
+        name: String,
+        invalid: u32,
+        hole: u32,
+    },
     RustStruct(String),
     Char,
     Option(Box<Descriptor>),
@@ -86,7 +56,6 @@ pub struct Function {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Closure {
-    pub shim_idx: u32,
     pub dtor_idx: u32,
     pub function: Function,
     pub mutable: bool,
@@ -113,7 +82,7 @@ pub enum VectorKind {
 impl Descriptor {
     pub fn decode(mut data: &[u32]) -> Descriptor {
         let descriptor = Descriptor::_decode(&mut data, false);
-        assert!(data.is_empty(), "remaining data {:?}", data);
+        assert!(data.is_empty(), "remaining data {data:?}");
         descriptor
     }
 
@@ -123,11 +92,13 @@ impl Descriptor {
             I16 => Descriptor::I16,
             I32 => Descriptor::I32,
             I64 => Descriptor::I64,
+            I128 => Descriptor::I128,
             U8 if clamped => Descriptor::ClampedU8,
             U8 => Descriptor::U8,
             U16 => Descriptor::U16,
             U32 => Descriptor::U32,
             U64 => Descriptor::U64,
+            U128 => Descriptor::U128,
             F32 => Descriptor::F32,
             F64 => Descriptor::F64,
             BOOLEAN => Descriptor::Boolean,
@@ -156,6 +127,17 @@ impl Descriptor {
                 let hole = get(data);
                 Descriptor::Enum { name, hole }
             }
+            STRING_ENUM => {
+                let name = get_string(data);
+                let variant_count = get(data);
+                let invalid = variant_count;
+                let hole = variant_count + 1;
+                Descriptor::StringEnum {
+                    name,
+                    invalid,
+                    hole,
+                }
+            }
             RUST_STRUCT => {
                 let name = get_string(data);
                 Descriptor::RustStruct(name)
@@ -168,7 +150,7 @@ impl Descriptor {
             UNIT => Descriptor::Unit,
             CLAMPED => Descriptor::_decode(data, true),
             NONNULL => Descriptor::NonNull,
-            other => panic!("unknown descriptor: {}", other),
+            other => panic!("unknown descriptor: {other}"),
         }
     }
 
@@ -176,13 +158,6 @@ impl Descriptor {
         match self {
             Descriptor::Function(f) => *f,
             _ => panic!("not a function"),
-        }
-    }
-
-    pub fn unwrap_closure(self) -> Closure {
-        match self {
-            Descriptor::Closure(s) => *s,
-            _ => panic!("not a closure"),
         }
     }
 
@@ -235,12 +210,14 @@ fn get_string(data: &mut &[u32]) -> String {
 
 impl Closure {
     fn decode(data: &mut &[u32]) -> Closure {
-        let shim_idx = get(data);
         let dtor_idx = get(data);
-        let mutable = get(data) == REFMUT;
+        let mutable = match get(data) {
+            0 => false,
+            1 => true,
+            other => panic!("expected bool value, got {other}"),
+        };
         assert_eq!(get(data), FUNCTION);
         Closure {
-            shim_idx,
             dtor_idx,
             mutable,
             function: Function::decode(data),
@@ -280,7 +257,11 @@ impl VectorKind {
             VectorKind::F64 => "Float64Array".to_string(),
             VectorKind::Externref => "any[]".to_string(),
             VectorKind::NamedExternref(ref name) => {
-                format!("({})[]", name)
+                if is_valid_ident(name.as_str()) {
+                    format!("{name}[]")
+                } else {
+                    format!("({name})[]")
+                }
             }
         }
     }

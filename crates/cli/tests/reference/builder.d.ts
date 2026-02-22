@@ -1,11 +1,9 @@
 /* tslint:disable */
 /* eslint-disable */
-/**
-*/
+
 export class ClassBuilder {
-  free(): void;
-/**
-* @returns {ClassBuilder}
-*/
-  static builder(): ClassBuilder;
+    private constructor();
+    free(): void;
+    [Symbol.dispose](): void;
+    static builder(): ClassBuilder;
 }

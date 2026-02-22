@@ -5,6 +5,7 @@ use web_sys::HtmlElement;
 #[wasm_bindgen(module = "/tests/wasm/element.js")]
 extern "C" {
     fn new_html() -> HtmlElement;
+    fn attach_element(element: &HtmlElement);
 }
 
 #[wasm_bindgen_test]
@@ -93,10 +94,10 @@ fn test_html_element() {
     assert_eq!(element.tab_index(), 1, "Should be tab_index");
 
     // TODO add a focus handler here
-    assert_eq!(element.focus().unwrap(), (), "No result");
+    let _: () = element.focus().unwrap();
 
     // TODO add a blur handler here
-    assert_eq!(element.blur().unwrap(), (), "No result");
+    let _: () = element.blur().unwrap();
 
     assert_eq!(element.access_key(), "", "Shouldn't have a access_key");
     element.set_access_key("a");
@@ -119,6 +120,8 @@ fn test_html_element() {
         "true",
         "Should be content_editable"
     );
+    // Safari does not consider an element "editable" unless it is connected to the DOM
+    attach_element(&element);
     assert!(element.is_content_editable(), "Should be content_editable");
 
     element.set_spellcheck(false);
@@ -128,8 +131,9 @@ fn test_html_element() {
 
     // TODO verify case where we have an offset_parent
     match element.offset_parent() {
-        None => assert!(true, "Shouldn't have an offset_parent set"),
-        _ => assert!(false, "Shouldn't have a offset_parent set"),
+        // Shouldn't have an offset_parent set
+        None => (),
+        _ => unreachable!("Shouldn't have a offset_parent set"),
     };
 
     // TODO verify when we have offsets

@@ -15,13 +15,12 @@ also like to be aware of it!
 
 * **IE 11** - `wasm-bindgen` by default requires support for
   `WebAssembly`, but no version of IE currently supports `WebAssembly`. You can
-  support IE by [compiling wasm files to JS using `wasm2js`][w2js] (you can [see
-  an example of doing this too](../examples/wasm2js.html)). Note
-  that at this time no bundler will do this by default, but we'd love to
-  document plugins which do this if you are aware of one!
+  support IE by [compiling Wasm files to JS using `wasm2js`][w2js]. Note that
+  at this time no bundler will do this by default, but we'd love to document
+  plugins which do this if you are aware of one!
 
 If you find other incompatibilities please report them to us! We'd love to
 either keep this list up-to-date or fix the underlying bugs :)
 
-[report it]: https://github.com/rustwasm/wasm-bindgen/issues/new
+[report it]: https://github.com/wasm-bindgen/wasm-bindgen/issues/new
 [w2js]: https://github.com/WebAssembly/binaryen

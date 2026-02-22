@@ -62,97 +62,101 @@ fn args_are_optional(name: &str) -> bool {
 
 pub fn interface(module: &Module) -> Result<String, Error> {
     let mut exports = String::new();
-
-    for entry in module.exports.iter() {
-        let id = match entry.item {
-            walrus::ExportItem::Function(i) => i,
-            walrus::ExportItem::Memory(_) => {
-                exports.push_str(&format!("  readonly {}: WebAssembly.Memory;\n", entry.name,));
-                continue;
-            }
-            walrus::ExportItem::Table(_) => {
-                exports.push_str(&format!("  readonly {}: WebAssembly.Table;\n", entry.name,));
-                continue;
-            }
-            walrus::ExportItem::Global(_) => continue,
-        };
-
-        let func = module.funcs.get(id);
-        let ty = module.types.get(func.ty());
-        let mut args = String::new();
-        for (i, _) in ty.params().iter().enumerate() {
-            if i > 0 {
-                args.push_str(", ");
-            }
-
-            push_index_identifier(i, &mut args);
-            if args_are_optional(&entry.name) {
-                args.push('?');
-            }
-            args.push_str(": number");
+    module_export_types(module, |name, ty| {
+        if name.contains(':') {
+            // This can happen when `name` is namespaced, like `__wbgt__reference_test::foo`.
+            // We should quote the name, as : is not valid in TypeScript identifiers.
+            writeln!(exports, "  readonly {name:?}: {ty};").unwrap();
+        } else {
+            writeln!(exports, "  readonly {name}: {ty};").unwrap();
         }
-
-        exports.push_str(&format!(
-            "  readonly {name}: ({args}) => {ret};\n",
-            name = entry.name,
-            args = args,
-            ret = match ty.results().len() {
-                0 => "void",
-                1 => "number",
-                _ => "Array",
-            },
-        ));
-    }
-
+    });
     Ok(exports)
 }
 
 pub fn typescript(module: &Module) -> Result<String, Error> {
     let mut exports = "/* tslint:disable */\n/* eslint-disable */\n".to_string();
-    for entry in module.exports.iter() {
-        let id = match entry.item {
-            walrus::ExportItem::Function(i) => i,
-            walrus::ExportItem::Memory(_) => {
-                exports.push_str(&format!(
-                    "export const {}: WebAssembly.Memory;\n",
-                    entry.name,
-                ));
-                continue;
-            }
-            walrus::ExportItem::Table(_) => {
-                exports.push_str(&format!(
-                    "export const {}: WebAssembly.Table;\n",
-                    entry.name,
-                ));
-                continue;
-            }
-            walrus::ExportItem::Global(_) => continue,
-        };
+    module_export_types(module, |name, ty| {
+        writeln!(exports, "export const {name}: {ty};").unwrap();
+    });
+    Ok(exports)
+}
 
-        let func = module.funcs.get(id);
-        let ty = module.types.get(func.ty());
-        let mut args = String::new();
-        for (i, _) in ty.params().iter().enumerate() {
-            if i > 0 {
-                args.push_str(", ");
+/// Iterates over all the exports in a module and generates TypeScript types. All
+/// name-type pairs are passed to the `export` function.
+fn module_export_types(module: &Module, mut export: impl FnMut(&str, &str)) {
+    for entry in module.exports.iter() {
+        match entry.item {
+            walrus::ExportItem::Function(id) => {
+                let func = module.funcs.get(id);
+                let ty = module.types.get(func.ty());
+                let ts_type = function_type_to_ts(ty, args_are_optional(&entry.name));
+                export(&entry.name, &ts_type);
             }
-            push_index_identifier(i, &mut args);
-            args.push_str(": number");
+            walrus::ExportItem::Memory(_) => export(&entry.name, "WebAssembly.Memory"),
+            walrus::ExportItem::Table(_) => export(&entry.name, "WebAssembly.Table"),
+            walrus::ExportItem::Global(_) => continue,
+            walrus::ExportItem::Tag(_) => export(&entry.name, "WebAssembly.Tag"),
+        };
+    }
+}
+fn val_type_to_ts(ty: walrus::ValType) -> &'static str {
+    // see https://webassembly.github.io/spec/js-api/index.html#towebassemblyvalue
+    // and https://webassembly.github.io/spec/js-api/index.html#tojsvalue
+    match ty {
+        walrus::ValType::I32 | walrus::ValType::F32 | walrus::ValType::F64 => "number",
+        walrus::ValType::I64 => "bigint",
+        // there could be anything behind a reference
+        walrus::ValType::Ref(_) => "any",
+        // V128 currently isn't supported in JS and therefore doesn't have a
+        // specific type in the spec. When it does get support, this type will
+        // still be technically correct, but should be updated to something more
+        // specific.
+        walrus::ValType::V128 => "any",
+    }
+}
+fn function_type_to_ts(function: &walrus::Type, all_args_optional: bool) -> String {
+    let mut out = String::new();
+
+    // parameters
+    out.push('(');
+    for (i, arg_type) in function.params().iter().enumerate() {
+        if i > 0 {
+            out.push_str(", ");
         }
 
-        exports.push_str(&format!(
-            "export function {name}({args}): {ret};\n",
-            name = entry.name,
-            args = args,
-            ret = match ty.results().len() {
-                0 => "void",
-                1 => "number",
-                _ => "Array",
-            },
-        ));
+        push_index_identifier(i, &mut out);
+        if all_args_optional {
+            out.push('?');
+        }
+        out.push_str(": ");
+        out.push_str(val_type_to_ts(*arg_type));
+    }
+    out.push(')');
+
+    // arrow
+    out.push_str(" => ");
+
+    // results
+    let results = function.results();
+    // this match follows the spec:
+    // https://webassembly.github.io/spec/js-api/index.html#exported-function-exotic-objects
+    match results.len() {
+        0 => out.push_str("void"),
+        1 => out.push_str(val_type_to_ts(results[0])),
+        _ => {
+            out.push('[');
+            for (i, result) in results.iter().enumerate() {
+                if i > 0 {
+                    out.push_str(", ");
+                }
+                out.push_str(val_type_to_ts(*result));
+            }
+            out.push(']');
+        }
     }
 
-    Ok(exports)
+    out
 }
 
 impl Output {
@@ -180,10 +184,10 @@ impl Output {
             push_index_identifier(set.len(), &mut name);
 
             js_imports.push_str(&format!(
-                "import * as import_{} from '{}';\n",
-                name, entry.module
+                "import * as import_{name} from '{}';\n",
+                entry.module
             ));
-            imports.push_str(&format!("'{}': import_{}, ", entry.module, name));
+            imports.push_str(&format!("'{}': import_{name}, ", entry.module));
         }
 
         for entry in self.module.exports.iter() {
@@ -205,7 +209,7 @@ impl Output {
         // This ends up helping out in situations such as:
         //
         // * The start function calls an imported function
-        // * That imported function in turn tries to access the wasm module
+        // * That imported function in turn tries to access the Wasm module
         //
         // If we don't do this then the second step won't work because the start
         // function is automatically executed before the promise of
@@ -226,8 +230,6 @@ impl Output {
                     {set_exports}
                 }})
             ",
-            imports = imports,
-            set_exports = set_exports,
         );
         let wasm = self.module.emit_wasm();
         let (bytes, booted) = if self.base64 {
@@ -254,9 +256,7 @@ impl Output {
                     fetch('{path}')
                         .then(res => res.arrayBuffer())
                         .then(bytes => {inst})
-                    ",
-                    path = path,
-                    inst = inst
+                    "
                 ),
             )
         } else {
@@ -269,10 +269,6 @@ impl Output {
             export const booted = {booted};
             {exports}
             ",
-            bytes = bytes,
-            booted = booted,
-            js_imports = js_imports,
-            exports = exports,
         );
         let wasm = if self.base64 { None } else { Some(wasm) };
         Ok((js, wasm))

@@ -1,43 +1,41 @@
 # Testing in Headless Browsers
 
-## Configure Your Test Crate
+## Configure via Environment Variables
 
-Add this to the root of your test crate, e.g. `$MY_CRATE/tests/web.rs`:
+By default tests run on Node.js. To target browsers you can use the `WASM_BINDGEN_USE_BROWSER` environment variable:
+
+```sh
+WASM_BINDGEN_USE_BROWSER=1 cargo test --target wasm32-unknown-unknown
+```
+
+The following configurations are available:
+- `WASM_BINDGEN_USE_DEDICATED_WORKER`: for dedicated workers
+- `WASM_BINDGEN_USE_SHARED_WORKER`: for shared workers
+- `WASM_BINDGEN_USE_SERVICE_WORKER`: for service workers
+- `WASM_BINDGEN_USE_DENO`: for Deno
+- `WASM_BINDGEN_USE_NODE_EXPERIMENTAL`: for Node.js but as an ES module
+
+## Force Configuration
+
+Tests can also be forced to run in a certain environment by using the
+`wasm_bindgen_test_configure!` macro:
 
 ```rust
 use wasm_bindgen_test::wasm_bindgen_test_configure;
 
+// Run in a browser.
 wasm_bindgen_test_configure!(run_in_browser);
-```
-
-Or if you need to run your tests inside a web worker, you can also
-configured it using the `wasm_bindgen_test_configure` macro as following
-snippet.
-
-```rust
-use wasm_bindgen_test::wasm_bindgen_test_configure;
-
-// Run in dedicated worker.
+// Or run in a dedicated worker.
 wasm_bindgen_test_configure!(run_in_dedicated_worker);
-// Or run in shared worker.
+// Or run in a shared worker.
 wasm_bindgen_test_configure!(run_in_shared_worker);
-// Or run in service worker.
+// Or run in a service worker.
 wasm_bindgen_test_configure!(run_in_service_worker);
+// Or run in Node.js but as an ES module.
+wasm_bindgen_test_configure!(run_in_node_experimental);
 ```
 
-Note that although a particular test crate must target either headless browsers
-or Node.js, you can have test suites for both Node.js and browsers for your
-project by using multiple test crates. For example:
-
-```
-$MY_CRATE/
-`-- tests
-    |-- node.rs              # The tests in this suite use the default Node.js.
-    |-- dedicated_worker.rs  # The tests in this suite are configured for dedicated workers.
-    |-- shared_worker.rs     # The tests in this suite are configured for shared workers.
-    |-- service_worker.rs    # The tests in this suite are configured for service workers.
-    `-- web.rs               # The tests in this suite are configured for browsers.
-```
+Note that this will ignore any environment variable set.
 
 ## Configuring Which Browser is Used
 
@@ -66,8 +64,9 @@ wasm-pack test --headless --chrome --firefox --safari
 
 ## Configuring Headless Browser capabilities
 
-Add the file `webdriver.json` to the root of your crate. Each browser has own 
-section for capabilities. For example:
+Either add the file `webdriver.json` to the root of your crate or ensure the environment
+variable `WASM_BINDGEN_TEST_WEBDRIVER_JSON` points to one.
+Each browser has own section for capabilities. For example:
 
 ```json
 {
@@ -141,7 +140,7 @@ installation by default.
 
 ### Running the Tests in the Remote Headless Browser
 
-Tests can be run on a remote webdriver. To do this, the above environment 
+Tests can be run on a remote webdriver. To do this, the above environment
 variables must be set as URL to the remote webdriver. For example:
 
 ```

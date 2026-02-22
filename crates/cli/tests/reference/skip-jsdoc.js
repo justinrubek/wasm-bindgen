@@ -1,16 +1,9 @@
-let wasm;
-export function __wbg_set_wasm(val) {
-    wasm = val;
-}
+/* @ts-self-types="./reference_test.d.ts" */
 
-/**
-* Manually documented function
-*
-* @param {number} arg - This is my arg. It is mine.
-* @returns to whence I came
-*/
-export function docme(arg) {
-    const ret = wasm.docme(arg);
-    return ret >>> 0;
-}
-
+import * as wasm from "./reference_test_bg.wasm";
+import { __wbg_set_wasm } from "./reference_test_bg.js";
+__wbg_set_wasm(wasm);
+wasm.__wbindgen_start();
+export {
+    docme, i_has_docs
+} from "./reference_test_bg.js";

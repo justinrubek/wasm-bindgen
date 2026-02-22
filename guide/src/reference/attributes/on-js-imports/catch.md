@@ -22,8 +22,12 @@ If calling the imported function throws an exception, then `Err` will be
 returned with the exception that was raised. Otherwise, `Ok` is returned with
 the result of the function.
 
-> By default `wasm-bindgen` will take no action when wasm calls a JS function
-> which ends up throwing an exception. The wasm spec right now doesn't support
+> By default `wasm-bindgen` will take no action when Wasm calls a JS function
+> which ends up throwing an exception. The Wasm spec right now doesn't support
 > stack unwinding and as a result Rust code **will not execute destructors**.
-> This can unfortunately cause memory leaks in Rust right now, but as soon as
-> wasm implements catching exceptions we'll be sure to add support as well!
+> This can unfortunately cause memory leaks in Rust right now.
+>
+> [This limitation is entirely avoided when building with `-Cpanic=unwind` and
+> the `std` feature enabled.](../catch-unwind.md) Unexpected JS exceptions that
+> would otherwise cause issues will result in a proper unwind, with the JS
+> exception propagated to the caller and destructors running correctly.

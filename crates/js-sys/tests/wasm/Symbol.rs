@@ -1,3 +1,5 @@
+#![cfg(test)]
+
 use js_sys::*;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
@@ -81,12 +83,16 @@ fn to_string_tag() {
     test_to_string_tag(&Symbol::to_string_tag());
 }
 
+#[allow(deprecated)]
 #[wasm_bindgen_test]
 fn for_() {
     let foo = JsValue::from(Symbol::for_("foo"));
     let bar = JsValue::from(Symbol::for_("bar"));
-    assert_eq!(foo, foo);
-    assert_eq!(bar, bar);
+    #[allow(clippy::eq_op)]
+    {
+        assert_eq!(foo, foo);
+        assert_eq!(bar, bar);
+    }
     assert_ne!(foo, bar);
     assert_ne!(bar, foo);
 
@@ -102,6 +108,7 @@ fn key_for() {
     assert!(Symbol::key_for(&gensym(JsValue::undefined())).is_undefined());
 }
 
+#[allow(deprecated)]
 #[wasm_bindgen_test]
 fn to_string() {
     assert_eq!(Symbol::iterator().to_string(), "Symbol(Symbol.iterator)");
@@ -113,6 +120,7 @@ fn to_string() {
     assert_eq!(gensym("desc".into()).to_string(), "Symbol(desc)");
 }
 
+#[allow(deprecated)]
 #[wasm_bindgen_test]
 fn unscopables() {
     assert_eq!(

@@ -2,6 +2,7 @@ use futures_channel::oneshot;
 use js_sys::{Promise, Uint8ClampedArray, WebAssembly};
 use rayon::prelude::*;
 use wasm_bindgen::prelude::*;
+use web_sys::ImageData;
 
 macro_rules! console_log {
     ($($t:tt)*) => (crate::log(&format_args!($($t)*).to_string()))
@@ -91,12 +92,12 @@ impl Scene {
             drop(tx.send(rgb_data));
         })?;
 
-        let done = async move {
+        let done = core::panic::AssertUnwindSafe(async move {
             match rx.await {
                 Ok(_data) => Ok(image_data(base, len, width, height).into()),
                 Err(_) => Err(JsValue::undefined()),
             }
-        };
+        });
 
         Ok(RenderingScene {
             promise: wasm_bindgen_futures::future_to_promise(done),
@@ -115,16 +116,6 @@ pub struct RenderingScene {
     promise: Promise,
     width: u32,
     height: u32,
-}
-
-// Inline the definition of `ImageData` here because `web_sys` uses
-// `&Clamped<Vec<u8>>`, whereas we want to pass in a JS object here.
-#[wasm_bindgen]
-extern "C" {
-    pub type ImageData;
-
-    #[wasm_bindgen(constructor, catch)]
-    fn new(data: &Uint8ClampedArray, width: f64, height: f64) -> Result<ImageData, JsValue>;
 }
 
 #[wasm_bindgen]
@@ -149,7 +140,7 @@ fn image_data(base: usize, len: usize, width: u32, height: u32) -> ImageData {
     //
     // FIXME: that this may or may not be UB based on Rust's rules. For example
     // threads may be doing unsynchronized writes to pixel data as we read it
-    // off here. In the context of wasm this may or may not be UB, we're
+    // off here. In the context of Wasm this may or may not be UB, we're
     // unclear! In any case for now it seems to work and produces a nifty
     // progressive rendering. A more production-ready application may prefer to
     // instead use some form of signaling here to request an update from the
@@ -157,5 +148,5 @@ fn image_data(base: usize, len: usize, width: u32, height: u32) -> ImageData {
     // could ensure that even on the Rust side of things it's not UB.
     let mem = wasm_bindgen::memory().unchecked_into::<WebAssembly::Memory>();
     let mem = Uint8ClampedArray::new(&mem.buffer()).slice(base as u32, (base + len) as u32);
-    ImageData::new(&mem, width as f64, height as f64).unwrap()
+    ImageData::new_with_js_u8_clamped_array_and_sh(&mem, width, height).unwrap()
 }

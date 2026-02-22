@@ -60,7 +60,7 @@ where the imports are instead handled through a separate preload script.
 
 ### `--debug`
 
-Generates a bit more JS and wasm in "debug mode" to help catch programmer
+Generates a bit more JS and Wasm in "debug mode" to help catch programmer
 errors, but this output isn't intended to be shipped to production.
 
 ### `--no-demangle`
@@ -76,21 +76,15 @@ synthesized by Rust's linker, LLD.
 ### `--keep-debug`
 
 When post-processing the `.wasm` binary, do not strip DWARF debug info custom
-sections.
+sections. See [debug information] for more.
+
+[debug information]: debug-info.html
 
 ### `--browser`
 
 When generating bundler-compatible code (see the section on [deployment]) this
 indicates that the bundled code is always intended to go into a browser so a few
 checks for Node.js can be elided.
-
-### `--reference-types`
-
-Enables usage of the [WebAssembly References Types
-proposal](https://github.com/webassembly/reference-types) proposal, meaning that
-the WebAssembly binary will use `externref` when importing and exporting
-functions that work with `JsValue`. For more information see the [documentation
-about reference types](./reference-types.md).
 
 ### `--omit-default-module-path`
 
@@ -117,3 +111,34 @@ containing the JS shim.
 On the no-modules target, `link_to!` won't work if used outside of a document,
 e.g. inside a worker. This is because it's impossible to figure out what the
 URL of the linked module is without a reference point like `import.meta.url`.
+
+### `--experimental-reset-state-function`
+
+Generates a `__wbg_reset_state()` function that allows reinitializing the
+entire library state for environments that wish to reuse and reset the same
+JavaScript execution context without reloading the entire library.
+
+This feature is currently only supported for `--target module`.
+
+When this flag is enabled, the generated code will also associate all objects
+with execution instance identity that validates and throws for stale references,
+carefully associating Wasm bindgen pointer and finalization references with
+an instance id that is changed whenever this function is called.
+
+**Example usage:**
+
+```javascript
+import { __wbg_reset_state, inc } from './wbg-lib.js';
+
+
+console.log(inc()); // logs 1
+console.log(inc()); // logs 2
+
+// fully reset the Wasm VM state
+__wbg_reset_state();
+
+console.log(inc()); // logs 1
+```
+
+**Note:** This feature adds overhead to the generated code and should only be 
+enabled when needed for environment-specific requirements.

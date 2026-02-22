@@ -18,7 +18,7 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/title)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
-    pub fn title(this: &HtmlElement) -> String;
+    pub fn title(this: &HtmlElement) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = title)]
     #[doc = "Setter for the `title` field of this object."]
     #[doc = ""]
@@ -40,6 +40,7 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn set_scroll_height(this: &HtmlElement, value: i32);
+    #[cfg(not(web_sys_unstable_apis))]
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = scrollTop)]
     #[doc = "Getter for the `scrollTop` field of this object."]
     #[doc = ""]
@@ -47,6 +48,7 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn scroll_top(this: &HtmlElement) -> i32;
+    #[cfg(not(web_sys_unstable_apis))]
     # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = scrollTop)]
     #[doc = "Setter for the `scrollTop` field of this object."]
     #[doc = ""]
@@ -60,7 +62,7 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/lang)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
-    pub fn lang(this: &HtmlElement) -> String;
+    pub fn lang(this: &HtmlElement) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = lang)]
     #[doc = "Setter for the `lang` field of this object."]
     #[doc = ""]
@@ -74,7 +76,7 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dir)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
-    pub fn dir(this: &HtmlElement) -> String;
+    pub fn dir(this: &HtmlElement) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = dir)]
     #[doc = "Setter for the `dir` field of this object."]
     #[doc = ""]
@@ -82,21 +84,13 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn set_dir(this: &HtmlElement, value: &str);
-    #[cfg(feature = "DomStringMap")]
-    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = dataset)]
-    #[doc = "Getter for the `dataset` field of this object."]
-    #[doc = ""]
-    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset)"]
-    #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `DomStringMap`, `HtmlElement`*"]
-    pub fn dataset(this: &HtmlElement) -> DomStringMap;
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = innerText)]
     #[doc = "Getter for the `innerText` field of this object."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/innerText)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
-    pub fn inner_text(this: &HtmlElement) -> String;
+    pub fn inner_text(this: &HtmlElement) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = innerText)]
     #[doc = "Setter for the `innerText` field of this object."]
     #[doc = ""]
@@ -132,27 +126,13 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn set_inert(this: &HtmlElement, value: bool);
-    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = tabIndex)]
-    #[doc = "Getter for the `tabIndex` field of this object."]
-    #[doc = ""]
-    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex)"]
-    #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
-    pub fn tab_index(this: &HtmlElement) -> i32;
-    # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = tabIndex)]
-    #[doc = "Setter for the `tabIndex` field of this object."]
-    #[doc = ""]
-    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex)"]
-    #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
-    pub fn set_tab_index(this: &HtmlElement, value: i32);
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = accessKey)]
     #[doc = "Getter for the `accessKey` field of this object."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/accessKey)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
-    pub fn access_key(this: &HtmlElement) -> String;
+    pub fn access_key(this: &HtmlElement) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = accessKey)]
     #[doc = "Setter for the `accessKey` field of this object."]
     #[doc = ""]
@@ -166,7 +146,7 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/accessKeyLabel)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
-    pub fn access_key_label(this: &HtmlElement) -> String;
+    pub fn access_key_label(this: &HtmlElement) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = draggable)]
     #[doc = "Getter for the `draggable` field of this object."]
     #[doc = ""]
@@ -187,7 +167,7 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/contentEditable)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
-    pub fn content_editable(this: &HtmlElement) -> String;
+    pub fn content_editable(this: &HtmlElement) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = contentEditable)]
     #[doc = "Setter for the `contentEditable` field of this object."]
     #[doc = ""]
@@ -202,6 +182,20 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn is_content_editable(this: &HtmlElement) -> bool;
+    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = popover)]
+    #[doc = "Getter for the `popover` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/popover)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn popover(this: &HtmlElement) -> Option<::alloc::string::String>;
+    # [wasm_bindgen (structural , catch , method , setter , js_class = "HTMLElement" , js_name = popover)]
+    #[doc = "Setter for the `popover` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/popover)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn set_popover(this: &HtmlElement, value: Option<&str>) -> Result<(), JsValue>;
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = spellcheck)]
     #[doc = "Getter for the `spellcheck` field of this object."]
     #[doc = ""]
@@ -216,14 +210,6 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn set_spellcheck(this: &HtmlElement, value: bool);
-    #[cfg(feature = "CssStyleDeclaration")]
-    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = style)]
-    #[doc = "Getter for the `style` field of this object."]
-    #[doc = ""]
-    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/style)"]
-    #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `CssStyleDeclaration`, `HtmlElement`*"]
-    pub fn style(this: &HtmlElement) -> CssStyleDeclaration;
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = offsetParent)]
     #[doc = "Getter for the `offsetParent` field of this object."]
     #[doc = ""]
@@ -259,6 +245,28 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn offset_height(this: &HtmlElement) -> i32;
+    #[cfg(web_sys_unstable_apis)]
+    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = scrollTop)]
+    #[doc = "Getter for the `scrollTop` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/scrollTop)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn scroll_top(this: &HtmlElement) -> f64;
+    #[cfg(web_sys_unstable_apis)]
+    # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = scrollTop)]
+    #[doc = "Setter for the `scrollTop` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/scrollTop)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn set_scroll_top(this: &HtmlElement, value: f64);
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = oncopy)]
     #[doc = "Getter for the `oncopy` field of this object."]
     #[doc = ""]
@@ -301,6 +309,14 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn set_onpaste(this: &HtmlElement, value: Option<&::js_sys::Function>);
+    #[cfg(feature = "CssStyleDeclaration")]
+    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = style)]
+    #[doc = "Getter for the `style` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/style)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CssStyleDeclaration`, `HtmlElement`*"]
+    pub fn style(this: &HtmlElement) -> CssStyleDeclaration;
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = onabort)]
     #[doc = "Getter for the `onabort` field of this object."]
     #[doc = ""]
@@ -343,6 +359,20 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn set_onfocus(this: &HtmlElement, value: Option<&::js_sys::Function>);
+    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = oncancel)]
+    #[doc = "Getter for the `oncancel` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/oncancel)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn oncancel(this: &HtmlElement) -> Option<::js_sys::Function>;
+    # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = oncancel)]
+    #[doc = "Setter for the `oncancel` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/oncancel)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn set_oncancel(this: &HtmlElement, value: Option<&::js_sys::Function>);
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = onauxclick)]
     #[doc = "Getter for the `onauxclick` field of this object."]
     #[doc = ""]
@@ -357,6 +387,20 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn set_onauxclick(this: &HtmlElement, value: Option<&::js_sys::Function>);
+    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = onbeforetoggle)]
+    #[doc = "Getter for the `onbeforetoggle` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/onbeforetoggle)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn onbeforetoggle(this: &HtmlElement) -> Option<::js_sys::Function>;
+    # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = onbeforetoggle)]
+    #[doc = "Setter for the `onbeforetoggle` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/onbeforetoggle)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn set_onbeforetoggle(this: &HtmlElement, value: Option<&::js_sys::Function>);
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = oncanplay)]
     #[doc = "Getter for the `oncanplay` field of this object."]
     #[doc = ""]
@@ -623,6 +667,20 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn set_oninput(this: &HtmlElement, value: Option<&::js_sys::Function>);
+    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = onbeforeinput)]
+    #[doc = "Getter for the `onbeforeinput` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/onbeforeinput)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn onbeforeinput(this: &HtmlElement) -> Option<::js_sys::Function>;
+    # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = onbeforeinput)]
+    #[doc = "Setter for the `onbeforeinput` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/onbeforeinput)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn set_onbeforeinput(this: &HtmlElement, value: Option<&::js_sys::Function>);
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = oninvalid)]
     #[doc = "Getter for the `oninvalid` field of this object."]
     #[doc = ""]
@@ -1449,6 +1507,56 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn set_onwebkittransitionend(this: &HtmlElement, value: Option<&::js_sys::Function>);
+    #[cfg(feature = "DomStringMap")]
+    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = dataset)]
+    #[doc = "Getter for the `dataset` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `DomStringMap`, `HtmlElement`*"]
+    pub fn dataset(this: &HtmlElement) -> DomStringMap;
+    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = nonce)]
+    #[doc = "Getter for the `nonce` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/nonce)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn nonce(this: &HtmlElement) -> ::alloc::string::String;
+    # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = nonce)]
+    #[doc = "Setter for the `nonce` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/nonce)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn set_nonce(this: &HtmlElement, value: &str);
+    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = autofocus)]
+    #[doc = "Getter for the `autofocus` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/autofocus)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn autofocus(this: &HtmlElement) -> bool;
+    # [wasm_bindgen (structural , catch , method , setter , js_class = "HTMLElement" , js_name = autofocus)]
+    #[doc = "Setter for the `autofocus` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/autofocus)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn set_autofocus(this: &HtmlElement, value: bool) -> Result<(), JsValue>;
+    # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = tabIndex)]
+    #[doc = "Getter for the `tabIndex` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn tab_index(this: &HtmlElement) -> i32;
+    # [wasm_bindgen (structural , method , setter , js_class = "HTMLElement" , js_name = tabIndex)]
+    #[doc = "Setter for the `tabIndex` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn set_tab_index(this: &HtmlElement, value: i32);
     # [wasm_bindgen (structural , method , getter , js_class = "HTMLElement" , js_name = onerror)]
     #[doc = "Getter for the `onerror` field of this object."]
     #[doc = ""]
@@ -1540,4 +1648,51 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
     pub fn focus(this: &HtmlElement) -> Result<(), JsValue>;
+    #[cfg(feature = "FocusOptions")]
+    # [wasm_bindgen (catch , method , structural , js_class = "HTMLElement" , js_name = focus)]
+    #[doc = "The `focus()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `FocusOptions`, `HtmlElement`*"]
+    pub fn focus_with_options(this: &HtmlElement, options: &FocusOptions) -> Result<(), JsValue>;
+    # [wasm_bindgen (catch , method , structural , js_class = "HTMLElement" , js_name = hidePopover)]
+    #[doc = "The `hidePopover()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/hidePopover)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn hide_popover(this: &HtmlElement) -> Result<(), JsValue>;
+    # [wasm_bindgen (catch , method , structural , js_class = "HTMLElement" , js_name = showPopover)]
+    #[doc = "The `showPopover()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/showPopover)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn show_popover(this: &HtmlElement) -> Result<(), JsValue>;
+    #[cfg(feature = "ShowPopoverOptions")]
+    # [wasm_bindgen (catch , method , structural , js_class = "HTMLElement" , js_name = showPopover)]
+    #[doc = "The `showPopover()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/showPopover)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`, `ShowPopoverOptions`*"]
+    pub fn show_popover_with_options(
+        this: &HtmlElement,
+        options: &ShowPopoverOptions,
+    ) -> Result<(), JsValue>;
+    # [wasm_bindgen (catch , method , structural , js_class = "HTMLElement" , js_name = togglePopover)]
+    #[doc = "The `togglePopover()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/togglePopover)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn toggle_popover(this: &HtmlElement) -> Result<bool, JsValue>;
+    # [wasm_bindgen (catch , method , structural , js_class = "HTMLElement" , js_name = togglePopover)]
+    #[doc = "The `togglePopover()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/togglePopover)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `HtmlElement`*"]
+    pub fn toggle_popover_with_force(this: &HtmlElement, force: bool) -> Result<bool, JsValue>;
 }

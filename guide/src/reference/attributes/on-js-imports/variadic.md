@@ -23,7 +23,7 @@ function sum(...rest) {
 ```
 
 This function doesn't translate directly into rust, since we don't currently support variadic
-arguments on the wasm target. To bind to it, we use a slice as the last argument, and annotate the
+arguments on the Wasm target. To bind to it, we use a slice as the last argument, and annotate the
 function as variadic:
 
 ```rust
@@ -35,6 +35,19 @@ extern "C" {
 ```
 
 when we call this function, the last argument will be expanded as the javascript expects.
+
+For functions that accept heterogeneous types (like `console.log`), you can use `&[JsValue]`:
+
+```rust
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console, variadic)]
+    fn log(args: &[JsValue]);
+}
+
+// Usage:
+log(&[JsValue::from("Hello"), JsValue::from(42), JsValue::TRUE]);
+```
 
 
 To export a rust function to javascript with a variadic argument, we will use the same bindgen variadic attribute and assume that the last argument will be the variadic array. For example the following rust function:

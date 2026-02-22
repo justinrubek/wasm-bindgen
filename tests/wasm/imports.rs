@@ -23,6 +23,7 @@ extern "C" {
 
     fn assert_valid_error(val: JsValue);
 
+    #[wasm_bindgen(thread_local_v2)]
     static IMPORT: JsValue;
 
     #[wasm_bindgen(js_name = return_three)]
@@ -35,7 +36,7 @@ extern "C" {
 
     #[allow(non_camel_case_types)]
     type bar;
-    #[wasm_bindgen(js_namespace = bar, js_name = foo)]
+    #[wasm_bindgen(thread_local_v2, js_namespace = bar, js_name = foo)]
     static FOO: JsValue;
 
     fn take_custom_type(f: CustomType) -> CustomType;
@@ -46,7 +47,7 @@ extern "C" {
 
     #[wasm_bindgen(js_name = "baz$")]
     fn renamed_with_dollar_sign();
-    #[wasm_bindgen(js_name = "$foo")]
+    #[wasm_bindgen(thread_local_v2, js_name = "$foo")]
     static RENAMED: JsValue;
 
     fn unused_import();
@@ -57,6 +58,7 @@ extern "C" {
     #[wasm_bindgen(static_method_of = StaticMethodCheck)]
     fn static_method_of_right_this();
 
+    #[wasm_bindgen(thread_local_v2)]
     static STATIC_STRING: String;
 
     #[derive(Clone)]
@@ -88,6 +90,15 @@ extern "C" {
 
     #[wasm_bindgen(js_name = "\"string'literal\nbreakers\r")]
     fn string_literal_breakers() -> u32;
+
+    #[wasm_bindgen(thread_local_v2)]
+    static UNDECLARED: Option<u32>;
+
+    #[wasm_bindgen(thread_local_v2, js_namespace = test)]
+    static UNDECLARED_NAMESPACE: Option<u32>;
+
+    #[wasm_bindgen(thread_local_v2, js_namespace = ["test1", "test2"])]
+    static UNDECLARED_NESTED_NAMESPACE: Option<u32>;
 }
 
 #[wasm_bindgen(module = "tests/wasm/imports_2.js")]
@@ -170,7 +181,7 @@ fn free_imports() {
 
 #[wasm_bindgen_test]
 fn import_a_field() {
-    assert_eq!(IMPORT.as_f64(), Some(1.0));
+    assert_eq!(IMPORT.with(JsValue::as_f64), Some(1.0));
 }
 
 #[wasm_bindgen_test]
@@ -190,9 +201,10 @@ fn rust_keyword() {
 
 #[wasm_bindgen_test]
 fn rust_keyword2() {
-    assert_eq!(FOO.as_f64(), Some(3.0));
+    assert_eq!(FOO.with(JsValue::as_f64), Some(3.0));
 }
 
+#[cfg(not(panic = "unwind"))]
 #[wasm_bindgen_test]
 fn custom_type() {
     take_custom_type(CustomType(()));
@@ -222,7 +234,7 @@ fn rename_with_string() {
 
 #[wasm_bindgen_test]
 fn rename_static_with_string() {
-    assert_eq!(RENAMED.as_f64(), Some(1.0));
+    assert_eq!(RENAMED.with(JsValue::as_f64), Some(1.0));
 }
 
 #[wasm_bindgen_test]
@@ -285,7 +297,7 @@ fn undefined_function_is_ok() {
 
 #[wasm_bindgen_test]
 fn static_string_ok() {
-    assert_eq!(*STATIC_STRING, "x");
+    STATIC_STRING.with(|s| assert_eq!(*s, "x"));
 }
 
 #[wasm_bindgen_test]
@@ -333,4 +345,11 @@ fn func_from_two_modules_same_js_namespace() {
 fn invalid_idents() {
     assert_eq!(kebab_case(), 42);
     assert_eq!(string_literal_breakers(), 42);
+}
+
+#[wasm_bindgen_test]
+fn undeclared() {
+    assert_eq!(UNDECLARED.with(Option::clone), None);
+    assert_eq!(UNDECLARED_NAMESPACE.with(Option::clone), None);
+    assert_eq!(UNDECLARED_NESTED_NAMESPACE.with(Option::clone), None);
 }

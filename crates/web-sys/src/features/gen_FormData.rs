@@ -62,6 +62,13 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `FormData`*"]
     pub fn delete(this: &FormData, name: &str);
+    # [wasm_bindgen (catch , method , structural , js_class = "FormData" , js_name = forEach)]
+    #[doc = "The `forEach()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/FormData/forEach)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `FormData`*"]
+    pub fn for_each(this: &FormData, callback: &::js_sys::Function) -> Result<(), JsValue>;
     # [wasm_bindgen (method , structural , js_class = "FormData" , js_name = get)]
     #[doc = "The `get()` method."]
     #[doc = ""]
@@ -111,4 +118,25 @@ extern "C" {
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `FormData`*"]
     pub fn set_with_str(this: &FormData, name: &str, value: &str) -> Result<(), JsValue>;
+    # [wasm_bindgen (method , structural , js_class = "FormData" , js_name = entries)]
+    #[doc = "The `entries()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/FormData/entries)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `FormData`*"]
+    pub fn entries(this: &FormData) -> ::js_sys::Iterator;
+    # [wasm_bindgen (method , structural , js_class = "FormData" , js_name = keys)]
+    #[doc = "The `keys()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/FormData/keys)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `FormData`*"]
+    pub fn keys(this: &FormData) -> ::js_sys::Iterator;
+    # [wasm_bindgen (method , structural , js_class = "FormData" , js_name = values)]
+    #[doc = "The `values()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/FormData/values)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `FormData`*"]
+    pub fn values(this: &FormData) -> ::js_sys::Iterator;
 }

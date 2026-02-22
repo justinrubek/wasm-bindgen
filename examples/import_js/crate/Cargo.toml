@@ -1,11 +1,15 @@
 [package]
-name = "import_js"
-version = "0.1.0"
 authors = ["The wasm-bindgen Developers"]
-edition = "2018"
+edition = "2021"
+name = "import_js"
+publish = false
+version = "0.0.0"
 
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-wasm-bindgen = "0.2.92"
+wasm-bindgen = { path = "../../../" }
+
+[lints]
+workspace = true

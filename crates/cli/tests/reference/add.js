@@ -1,25 +1,9 @@
-let wasm;
-export function __wbg_set_wasm(val) {
-    wasm = val;
-}
+/* @ts-self-types="./reference_test.d.ts" */
 
-/**
-* @param {number} a
-* @param {number} b
-* @returns {number}
-*/
-export function add_u32(a, b) {
-    const ret = wasm.add_u32(a, b);
-    return ret >>> 0;
-}
-
-/**
-* @param {number} a
-* @param {number} b
-* @returns {number}
-*/
-export function add_i32(a, b) {
-    const ret = wasm.add_i32(a, b);
-    return ret;
-}
-
+import * as wasm from "./reference_test_bg.wasm";
+import { __wbg_set_wasm } from "./reference_test_bg.js";
+__wbg_set_wasm(wasm);
+wasm.__wbindgen_start();
+export {
+    add_i32, add_u32
+} from "./reference_test_bg.js";

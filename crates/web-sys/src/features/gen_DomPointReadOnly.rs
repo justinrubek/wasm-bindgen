@@ -83,7 +83,7 @@ extern "C" {
     # [wasm_bindgen (static_method_of = DomPointReadOnly , js_class = "DOMPointReadOnly" , js_name = fromPoint)]
     #[doc = "The `fromPoint()` method."]
     #[doc = ""]
-    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/DOMPointReadOnly/fromPoint)"]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/DOMPointReadOnly/fromPoint_static)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `DomPointReadOnly`*"]
     pub fn from_point() -> DomPointReadOnly;
@@ -91,10 +91,29 @@ extern "C" {
     # [wasm_bindgen (static_method_of = DomPointReadOnly , js_class = "DOMPointReadOnly" , js_name = fromPoint)]
     #[doc = "The `fromPoint()` method."]
     #[doc = ""]
-    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/DOMPointReadOnly/fromPoint)"]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/DOMPointReadOnly/fromPoint_static)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `DomPointInit`, `DomPointReadOnly`*"]
     pub fn from_point_with_other(other: &DomPointInit) -> DomPointReadOnly;
+    #[cfg(feature = "DomPoint")]
+    # [wasm_bindgen (catch , method , structural , js_class = "DOMPointReadOnly" , js_name = matrixTransform)]
+    #[doc = "The `matrixTransform()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/DOMPointReadOnly/matrixTransform)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `DomPoint`, `DomPointReadOnly`*"]
+    pub fn matrix_transform(this: &DomPointReadOnly) -> Result<DomPoint, JsValue>;
+    #[cfg(all(feature = "DomMatrixInit", feature = "DomPoint",))]
+    # [wasm_bindgen (catch , method , structural , js_class = "DOMPointReadOnly" , js_name = matrixTransform)]
+    #[doc = "The `matrixTransform()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/DOMPointReadOnly/matrixTransform)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `DomMatrixInit`, `DomPoint`, `DomPointReadOnly`*"]
+    pub fn matrix_transform_with_matrix(
+        this: &DomPointReadOnly,
+        matrix: &DomMatrixInit,
+    ) -> Result<DomPoint, JsValue>;
     # [wasm_bindgen (method , structural , js_class = "DOMPointReadOnly" , js_name = toJSON)]
     #[doc = "The `toJSON()` method."]
     #[doc = ""]

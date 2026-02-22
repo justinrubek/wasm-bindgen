@@ -1,15 +1,17 @@
-use crate::descriptor::Descriptor;
-use crate::wit::{AdapterType, Instruction, InstructionBuilder};
+use crate::descriptor::{Descriptor, Function};
+use crate::wasm_conventions::get_function_table_entry;
+use crate::wit::{AdapterType, ClosureDtor, Instruction, InstructionBuilder};
 use crate::wit::{InstructionData, StackChange};
 use anyhow::{bail, format_err, Error};
-use walrus::ValType;
+use walrus::{ExportId, ValType};
+use wasm_bindgen_shared::identifier::to_valid_ident;
 
 impl InstructionBuilder<'_, '_> {
     /// Processes one more `Descriptor` as an argument to a JS function that
-    /// wasm is calling.
+    /// Wasm is calling.
     ///
     /// This will internally skip `Unit` and otherwise build up the `bindings`
-    /// map and ensure that it's correctly mapped from wasm to JS.
+    /// map and ensure that it's correctly mapped from Wasm to JS.
     pub fn outgoing(&mut self, arg: &Descriptor) -> Result<(), Error> {
         if let Descriptor::Unit = arg {
             return Ok(());
@@ -65,6 +67,20 @@ impl InstructionBuilder<'_, '_> {
             Descriptor::U32 => self.outgoing_i32(AdapterType::U32),
             Descriptor::I64 => self.outgoing_i64(AdapterType::I64),
             Descriptor::U64 => self.outgoing_i64(AdapterType::U64),
+            Descriptor::I128 => {
+                self.instruction(
+                    &[AdapterType::I64, AdapterType::I64],
+                    Instruction::WasmToInt128 { signed: true },
+                    &[AdapterType::S128],
+                );
+            }
+            Descriptor::U128 => {
+                self.instruction(
+                    &[AdapterType::I64, AdapterType::I64],
+                    Instruction::WasmToInt128 { signed: false },
+                    &[AdapterType::U128],
+                );
+            }
             Descriptor::F32 => {
                 self.get(AdapterType::F32);
                 self.output.push(AdapterType::F32);
@@ -74,6 +90,7 @@ impl InstructionBuilder<'_, '_> {
                 self.output.push(AdapterType::F64);
             }
             Descriptor::Enum { name, .. } => self.outgoing_i32(AdapterType::Enum(name.clone())),
+            Descriptor::StringEnum { name, .. } => self.outgoing_string_enum(name),
 
             Descriptor::Char => {
                 self.instruction(
@@ -95,7 +112,7 @@ impl InstructionBuilder<'_, '_> {
             Descriptor::Ref(d) => self.outgoing_ref(false, d)?,
             Descriptor::RefMut(d) => self.outgoing_ref(true, d)?,
 
-            Descriptor::CachedString => self.cached_string(false, true)?,
+            Descriptor::CachedString => self.cached_string(true)?,
 
             Descriptor::String => {
                 // fetch the ptr/length ...
@@ -126,8 +143,7 @@ impl InstructionBuilder<'_, '_> {
             Descriptor::Vector(_) => {
                 let kind = arg.vector_kind().ok_or_else(|| {
                     format_err!(
-                        "unsupported argument type for calling JS function from Rust {:?}",
-                        arg
+                        "unsupported argument type for calling JS function from Rust {arg:?}"
                     )
                 })?;
                 let mem = self.cx.memory()?;
@@ -146,10 +162,14 @@ impl InstructionBuilder<'_, '_> {
             Descriptor::Option(d) => self.outgoing_option(d)?,
             Descriptor::Result(d) => self.outgoing_result(d)?,
 
-            Descriptor::Function(_) | Descriptor::Closure(_) | Descriptor::Slice(_) => bail!(
-                "unsupported argument type for calling JS function from Rust: {:?}",
-                arg
-            ),
+            Descriptor::Function(descriptor) => {
+                // By-value ImmediateClosure<dyn Fn(...)> (immutable)
+                self.outgoing_function(false, descriptor, None)?;
+            }
+
+            Descriptor::Slice(_) => {
+                bail!("unsupported argument type for calling JS function from Rust: {arg:?}")
+            }
 
             // nothing to do
             Descriptor::Unit => {}
@@ -158,6 +178,10 @@ impl InstructionBuilder<'_, '_> {
             Descriptor::ClampedU8 => unreachable!(),
 
             Descriptor::NonNull => self.outgoing_i32(AdapterType::NonNull),
+
+            Descriptor::Closure(d) => {
+                self.outgoing_function(d.mutable, &d.function, Some(d.dtor_idx))?
+            }
         }
         Ok(())
     }
@@ -178,7 +202,7 @@ impl InstructionBuilder<'_, '_> {
                     &[AdapterType::NamedExternref(name.clone())],
                 );
             }
-            Descriptor::CachedString => self.cached_string(false, false)?,
+            Descriptor::CachedString => self.cached_string(false)?,
 
             Descriptor::String => {
                 self.instruction(
@@ -190,8 +214,7 @@ impl InstructionBuilder<'_, '_> {
             Descriptor::Slice(_) => {
                 let kind = arg.vector_kind().ok_or_else(|| {
                     format_err!(
-                        "unsupported argument type for calling JS function from Rust {:?}",
-                        arg
+                        "unsupported argument type for calling JS function from Rust {arg:?}"
                     )
                 })?;
                 let mem = self.cx.memory()?;
@@ -206,31 +229,75 @@ impl InstructionBuilder<'_, '_> {
             }
 
             Descriptor::Function(descriptor) => {
-                // synthesize the a/b arguments that aren't present in the
-                // signature from wasm-bindgen but are present in the wasm file.
-                let mut descriptor = (**descriptor).clone();
-                let nargs = descriptor.arguments.len();
-                descriptor.arguments.insert(0, Descriptor::I32);
-                descriptor.arguments.insert(0, Descriptor::I32);
-                let adapter = self
-                    .cx
-                    .table_element_adapter(descriptor.shim_idx, descriptor)?;
-                self.instruction(
-                    &[AdapterType::I32, AdapterType::I32],
-                    Instruction::StackClosure {
-                        adapter,
-                        nargs,
-                        mutable,
-                    },
-                    &[AdapterType::Function],
-                );
+                self.outgoing_function(mutable, descriptor, None)?;
             }
 
+            // ImmediateClosure<dyn FnMut(...)> emits RefMut(Function(...)) to
+            // signal that a reentrancy guard is needed in the JS wrapper.
+            Descriptor::RefMut(inner) => match inner.as_ref() {
+                Descriptor::Function(descriptor) => {
+                    self.outgoing_function(true, descriptor, None)?;
+                }
+                _ => bail!(
+                    "unsupported reference argument type for calling JS function from Rust: {arg:?}"
+                ),
+            },
+
             _ => bail!(
-                "unsupported reference argument type for calling JS function from Rust: {:?}",
-                arg
+                "unsupported reference argument type for calling JS function from Rust: {arg:?}"
             ),
         }
+        Ok(())
+    }
+
+    // The function table never changes right now, so we can statically
+    // look up the desired function.
+    fn export_table_element(&mut self, idx: u32) -> ExportId {
+        let module = &mut *self.cx.module;
+        let func_id = get_function_table_entry(module, idx).unwrap();
+        if let Some(export) = module
+            .exports
+            .iter()
+            .find(|e| matches!(e.item, walrus::ExportItem::Function(id) if id == func_id))
+        {
+            return export.id();
+        }
+        let name = match &module.funcs.get(func_id).name {
+            Some(name) => to_valid_ident(name),
+            None => format!("__wasm_bindgen_func_elem_{}", func_id.index()),
+        };
+        module.exports.add(&name, func_id)
+    }
+
+    fn outgoing_function(
+        &mut self,
+        mutable: bool,
+        descriptor: &Function,
+        dtor_idx: Option<u32>,
+    ) -> Result<(), Error> {
+        let mut descriptor = descriptor.clone();
+        // synthesize the a/b arguments that aren't present in the
+        // signature from wasm-bindgen but are present in the Wasm file.
+        let nargs = descriptor.arguments.len();
+        descriptor.arguments.insert(0, Descriptor::I32);
+        descriptor.arguments.insert(0, Descriptor::I32);
+        let shim = self.export_table_element(descriptor.shim_idx);
+        let dtor = match dtor_idx {
+            None => ClosureDtor::Immediate,
+            Some(0) => ClosureDtor::Borrowed,
+            Some(idx) => ClosureDtor::OwnClosure(self.export_table_element(idx)),
+        };
+        let adapter = self.cx.export_adapter(shim, descriptor)?;
+        self.instruction(
+            &[AdapterType::I32, AdapterType::I32],
+            Instruction::Closure {
+                adapter,
+                nargs,
+                mutable,
+                dtor,
+            },
+            &[AdapterType::Function],
+        );
         Ok(())
     }
 
@@ -256,16 +323,30 @@ impl InstructionBuilder<'_, '_> {
                     &[AdapterType::NamedExternref(name.clone()).option()],
                 );
             }
-            Descriptor::I8 => self.out_option_sentinel(AdapterType::S8),
-            Descriptor::U8 => self.out_option_sentinel(AdapterType::U8),
-            Descriptor::I16 => self.out_option_sentinel(AdapterType::S16),
-            Descriptor::U16 => self.out_option_sentinel(AdapterType::U16),
-            Descriptor::I32 => self.option_native(true, ValType::I32),
-            Descriptor::U32 => self.option_native(false, ValType::I32),
+            Descriptor::I8 => self.out_option_sentinel32(AdapterType::S8),
+            Descriptor::U8 => self.out_option_sentinel32(AdapterType::U8),
+            Descriptor::I16 => self.out_option_sentinel32(AdapterType::S16),
+            Descriptor::U16 => self.out_option_sentinel32(AdapterType::U16),
+            Descriptor::I32 => self.out_option_sentinel64(AdapterType::S32),
+            Descriptor::U32 => self.out_option_sentinel64(AdapterType::U32),
             Descriptor::I64 => self.option_native(true, ValType::I64),
             Descriptor::U64 => self.option_native(false, ValType::I64),
-            Descriptor::F32 => self.option_native(true, ValType::F32),
+            Descriptor::F32 => self.out_option_sentinel64(AdapterType::F32),
             Descriptor::F64 => self.option_native(true, ValType::F64),
+            Descriptor::I128 => {
+                self.instruction(
+                    &[AdapterType::I32, AdapterType::I64, AdapterType::I64],
+                    Instruction::OptionWasmToInt128 { signed: true },
+                    &[AdapterType::S128.option()],
+                );
+            }
+            Descriptor::U128 => {
+                self.instruction(
+                    &[AdapterType::I32, AdapterType::I64, AdapterType::I64],
+                    Instruction::OptionWasmToInt128 { signed: false },
+                    &[AdapterType::U128.option()],
+                );
+            }
             Descriptor::Boolean => {
                 self.instruction(
                     &[AdapterType::I32],
@@ -287,6 +368,13 @@ impl InstructionBuilder<'_, '_> {
                     &[AdapterType::Enum(name.clone()).option()],
                 );
             }
+            Descriptor::StringEnum { name, .. } => {
+                self.instruction(
+                    &[AdapterType::I32],
+                    Instruction::OptionWasmToStringEnum { name: name.clone() },
+                    &[AdapterType::StringEnum(name.clone()).option()],
+                );
+            }
             Descriptor::RustStruct(name) => {
                 self.instruction(
                     &[AdapterType::I32],
@@ -299,13 +387,12 @@ impl InstructionBuilder<'_, '_> {
             Descriptor::Ref(d) => self.outgoing_option_ref(false, d)?,
             Descriptor::RefMut(d) => self.outgoing_option_ref(true, d)?,
 
-            Descriptor::CachedString => self.cached_string(true, true)?,
+            Descriptor::CachedString => self.cached_string(true)?,
 
             Descriptor::String | Descriptor::Vector(_) => {
                 let kind = arg.vector_kind().ok_or_else(|| {
                     format_err!(
-                        "unsupported optional slice type for calling JS function from Rust {:?}",
-                        arg
+                        "unsupported optional slice type for calling JS function from Rust {arg:?}"
                     )
                 })?;
                 let mem = self.cx.memory()?;
@@ -328,8 +415,7 @@ impl InstructionBuilder<'_, '_> {
             ),
 
             _ => bail!(
-                "unsupported optional argument type for calling JS function from Rust: {:?}",
-                arg
+                "unsupported optional argument type for calling JS function from Rust: {arg:?}"
             ),
         }
         Ok(())
@@ -349,9 +435,12 @@ impl InstructionBuilder<'_, '_> {
             | Descriptor::F64
             | Descriptor::I64
             | Descriptor::U64
+            | Descriptor::I128
+            | Descriptor::U128
             | Descriptor::Boolean
             | Descriptor::Char
             | Descriptor::Enum { .. }
+            | Descriptor::StringEnum { .. }
             | Descriptor::RustStruct(_)
             | Descriptor::Ref(_)
             | Descriptor::RefMut(_)
@@ -460,10 +549,9 @@ impl InstructionBuilder<'_, '_> {
             | Descriptor::Function(_)
             | Descriptor::Closure(_)
             | Descriptor::Slice(_)
-            | Descriptor::Result(_) => bail!(
-                "unsupported Result type for returning from exported Rust function: {:?}",
-                arg
-            ),
+            | Descriptor::Result(_) => {
+                bail!("unsupported Result type for returning from exported Rust function: {arg:?}")
+            }
         }
         Ok(())
     }
@@ -486,12 +574,11 @@ impl InstructionBuilder<'_, '_> {
                     &[AdapterType::NamedExternref(name.clone()).option()],
                 );
             }
-            Descriptor::CachedString => self.cached_string(true, false)?,
+            Descriptor::CachedString => self.cached_string(false)?,
             Descriptor::String | Descriptor::Slice(_) => {
                 let kind = arg.vector_kind().ok_or_else(|| {
                     format_err!(
-                        "unsupported optional slice type for calling JS function from Rust {:?}",
-                        arg
+                        "unsupported optional slice type for calling JS function from Rust {arg:?}"
                     )
                 })?;
                 let mem = self.cx.memory()?;
@@ -505,37 +592,42 @@ impl InstructionBuilder<'_, '_> {
                 );
             }
             _ => bail!(
-                "unsupported optional ref argument type for calling JS function from Rust: {:?}",
-                arg
+                "unsupported optional ref argument type for calling JS function from Rust: {arg:?}"
             ),
         }
         Ok(())
     }
 
+    fn outgoing_string_enum(&mut self, name: &str) {
+        self.instruction(
+            &[AdapterType::I32],
+            Instruction::WasmToStringEnum {
+                name: name.to_string(),
+            },
+            &[AdapterType::StringEnum(name.to_string())],
+        );
+    }
+
     fn outgoing_i32(&mut self, output: AdapterType) {
-        let instr = Instruction::WasmToInt {
-            input: walrus::ValType::I32,
-            output: output.clone(),
+        let instr = Instruction::WasmToInt32 {
+            unsigned_32: output == AdapterType::U32 || output == AdapterType::NonNull,
         };
         self.instruction(&[AdapterType::I32], instr, &[output]);
     }
-
     fn outgoing_i64(&mut self, output: AdapterType) {
-        let instr = Instruction::WasmToInt {
-            input: walrus::ValType::I64,
-            output: output.clone(),
+        let instr = Instruction::WasmToInt64 {
+            unsigned: output == AdapterType::U64,
         };
         self.instruction(&[AdapterType::I64], instr, &[output]);
     }
 
-    fn cached_string(&mut self, optional: bool, owned: bool) -> Result<(), Error> {
+    fn cached_string(&mut self, owned: bool) -> Result<(), Error> {
         let mem = self.cx.memory()?;
         let free = self.cx.free()?;
         self.instruction(
             &[AdapterType::I32, AdapterType::I32],
             Instruction::CachedStringLoad {
                 owned,
-                optional,
                 mem,
                 free,
                 table: None,
@@ -554,10 +646,18 @@ impl InstructionBuilder<'_, '_> {
         );
     }
 
-    fn out_option_sentinel(&mut self, ty: AdapterType) {
+    fn out_option_sentinel32(&mut self, ty: AdapterType) {
         self.instruction(
             &[AdapterType::I32],
             Instruction::OptionU32Sentinel,
+            &[ty.option()],
+        );
+    }
+
+    fn out_option_sentinel64(&mut self, ty: AdapterType) {
+        self.instruction(
+            &[AdapterType::F64],
+            Instruction::OptionF64Sentinel,
             &[ty.option()],
         );
     }

@@ -7,7 +7,7 @@ use web_sys::{console, HtmlElement, HtmlInputElement, MessageEvent, Worker};
 ///
 /// This struct will be the main object which responds to messages passed to the
 /// worker. It stores the last number which it was passed to have a state. The
-/// statefulness is not is not required in this example but should show how
+/// statefulness is not required in this example but should show how
 /// larger, more complex scenarios with statefulness can be set up.
 #[wasm_bindgen]
 pub struct NumberEval {
@@ -64,6 +64,7 @@ fn setup_input_oninput_callback(worker: Rc<RefCell<web_sys::Worker>>) {
     #[allow(unused_assignments)]
     let mut persistent_callback_handle = get_on_msg_callback();
 
+    #[allow(unused_assignments)]
     let callback = Closure::new(move || {
         console::log_1(&"oninput callback triggered".into());
         let document = web_sys::window().unwrap().document().unwrap();

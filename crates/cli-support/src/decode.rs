@@ -1,4 +1,4 @@
-use std::str;
+use std::{ops::Deref, str};
 
 pub trait Decode<'src>: Sized {
     fn decode(data: &mut &'src [u8]) -> Self;
@@ -10,10 +10,28 @@ pub trait Decode<'src>: Sized {
     }
 }
 
+pub struct LitOrExpr<'src> {
+    str: &'src str,
+}
+
 fn get(b: &mut &[u8]) -> u8 {
     let r = b[0];
     *b = &b[1..];
     r
+}
+
+impl Deref for LitOrExpr<'_> {
+    type Target = str;
+    fn deref(&self) -> &Self::Target {
+        self.str
+    }
+}
+
+impl<'src> Decode<'src> for LitOrExpr<'src> {
+    fn decode(data: &mut &'src [u8]) -> Self {
+        let str = <&'src str>::decode(data);
+        Self { str }
+    }
 }
 
 impl<'src> Decode<'src> for bool {
@@ -43,7 +61,7 @@ impl<'src> Decode<'src> for &'src str {
         let (a, b) = data.split_at(n as usize);
         *data = b;
         let r = str::from_utf8(a).unwrap();
-        log::trace!("decoded string {:?}", r);
+        log::trace!("decoded string {r:?}");
         r
     }
 }
@@ -58,7 +76,7 @@ impl<'src, T: Decode<'src>> Decode<'src> for Vec<T> {
     fn decode(data: &mut &'src [u8]) -> Self {
         let n = u32::decode(data);
         let mut v = Vec::with_capacity(n as usize);
-        log::trace!("found a list of length {}", n);
+        log::trace!("found a list of length {n}");
         for _ in 0..n {
             v.push(Decode::decode(data));
         }

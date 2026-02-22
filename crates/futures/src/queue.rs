@@ -1,13 +1,15 @@
+use alloc::collections::VecDeque;
+use alloc::rc::Rc;
+use core::cell::{Cell, RefCell};
+use core::panic::AssertUnwindSafe;
 use js_sys::Promise;
-use std::cell::{Cell, RefCell};
-use std::collections::VecDeque;
-use std::rc::Rc;
 use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsError;
 
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen]
-    fn queueMicrotask(closure: &Closure<dyn FnMut(JsValue)>);
+    fn queueMicrotask(closure: &Closure<dyn FnMut(JsValue) -> Result<(), JsError>>);
 
     type Global;
 
@@ -52,7 +54,7 @@ impl QueueState {
 pub(crate) struct Queue {
     state: Rc<QueueState>,
     promise: Promise,
-    closure: Closure<dyn FnMut(JsValue)>,
+    closure: Closure<dyn FnMut(JsValue) -> Result<(), JsError>>,
     has_queue_microtask: bool,
 }
 
@@ -66,11 +68,12 @@ impl Queue {
             if self.has_queue_microtask {
                 queueMicrotask(&self.closure);
             } else {
-                let _ = self.promise.then(&self.closure);
+                let _ = self.promise.then_map(&self.closure);
             }
         }
     }
     // Append a task to the currently running queue, or schedule it
+    #[cfg(not(target_feature = "atomics"))]
     pub(crate) fn push_task(&self, task: Rc<crate::task::Task>) {
         // It would make sense to run this task on the same tick.  For now, we
         // make the simplifying choice of always scheduling tasks for a future tick.
@@ -94,19 +97,35 @@ impl Queue {
             promise: Promise::resolve(&JsValue::undefined()),
 
             closure: {
-                let state = Rc::clone(&state);
+                let state = AssertUnwindSafe(Rc::clone(&state));
 
                 // This closure will only be called on the next microtask event
                 // tick
-                Closure::new(move |_| state.run_all())
+                Closure::new(move |_| {
+                    state.run_all();
+                    Ok(())
+                })
             },
 
             state,
             has_queue_microtask,
         }
     }
-}
 
-thread_local! {
-    pub(crate) static QUEUE: Queue = Queue::new();
+    pub(crate) fn with<R>(f: impl FnOnce(&Self) -> R) -> R {
+        use once_cell::unsync::Lazy;
+
+        struct Wrapper<T>(Lazy<T>);
+
+        #[cfg(not(target_feature = "atomics"))]
+        unsafe impl<T> Sync for Wrapper<T> {}
+
+        #[cfg(not(target_feature = "atomics"))]
+        unsafe impl<T> Send for Wrapper<T> {}
+
+        #[cfg_attr(target_feature = "atomics", thread_local)]
+        static QUEUE: Wrapper<Queue> = Wrapper(Lazy::new(Queue::new));
+
+        f(&QUEUE.0)
+    }
 }

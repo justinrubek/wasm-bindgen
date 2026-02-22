@@ -1,3 +1,5 @@
+extern crate alloc;
+
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_test::*;
 
@@ -22,15 +24,20 @@ mod generated {
 pub mod array;
 pub mod array_buffer;
 pub mod callbacks;
+pub mod callbacks_typed;
 pub mod consts;
 pub mod dictionary;
 pub mod enums;
 pub mod global;
+pub mod iterable;
 pub mod maplike;
 pub mod namespace;
 pub mod no_interface;
 pub mod promise;
+pub mod record;
 pub mod setlike;
+pub mod signature_stability;
 pub mod simple;
 pub mod throws;
 pub mod unstable;
+pub mod upcast;

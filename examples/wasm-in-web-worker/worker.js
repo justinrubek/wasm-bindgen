@@ -1,7 +1,7 @@
 // The worker has its own scope and no direct access to functions/objects of the
 // global scope. We import the generated JS file to make `wasm_bindgen`
 // available which we need to initialize our Wasm code.
-importScripts('./pkg/wasm_in_web_worker.js');
+importScripts('./wasm_in_web_worker.js');
 
 console.log('Initializing worker')
 
@@ -10,8 +10,8 @@ console.log('Initializing worker')
 const {NumberEval} = wasm_bindgen;
 
 async function init_wasm_in_worker() {
-    // Load the wasm file by awaiting the Promise returned by `wasm_bindgen`.
-    await wasm_bindgen('./pkg/wasm_in_web_worker_bg.wasm');
+    // Load the Wasm file by awaiting the Promise returned by `wasm_bindgen`.
+    await wasm_bindgen('./wasm_in_web_worker_bg.wasm');
 
     // Create a new object of the `NumberEval` struct.
     var num_eval = NumberEval.new();

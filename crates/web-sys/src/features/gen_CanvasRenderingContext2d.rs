@@ -40,7 +40,9 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
-    pub fn global_composite_operation(this: &CanvasRenderingContext2d) -> Result<String, JsValue>;
+    pub fn global_composite_operation(
+        this: &CanvasRenderingContext2d,
+    ) -> Result<::alloc::string::String, JsValue>;
     # [wasm_bindgen (structural , catch , method , setter , js_class = "CanvasRenderingContext2D" , js_name = globalCompositeOperation)]
     #[doc = "Setter for the `globalCompositeOperation` field of this object."]
     #[doc = ""]
@@ -64,7 +66,34 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/strokeStyle)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
+    #[deprecated]
     pub fn set_stroke_style(this: &CanvasRenderingContext2d, value: &::wasm_bindgen::JsValue);
+    # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = strokeStyle)]
+    #[doc = "Setter for the `strokeStyle` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/strokeStyle)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
+    pub fn set_stroke_style_str(this: &CanvasRenderingContext2d, value: &str);
+    #[cfg(feature = "CanvasGradient")]
+    # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = strokeStyle)]
+    #[doc = "Setter for the `strokeStyle` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/strokeStyle)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CanvasGradient`, `CanvasRenderingContext2d`*"]
+    pub fn set_stroke_style_canvas_gradient(
+        this: &CanvasRenderingContext2d,
+        value: &CanvasGradient,
+    );
+    #[cfg(feature = "CanvasPattern")]
+    # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = strokeStyle)]
+    #[doc = "Setter for the `strokeStyle` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/strokeStyle)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CanvasPattern`, `CanvasRenderingContext2d`*"]
+    pub fn set_stroke_style_canvas_pattern(this: &CanvasRenderingContext2d, value: &CanvasPattern);
     # [wasm_bindgen (structural , method , getter , js_class = "CanvasRenderingContext2D" , js_name = fillStyle)]
     #[doc = "Getter for the `fillStyle` field of this object."]
     #[doc = ""]
@@ -78,14 +107,38 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
+    #[deprecated]
     pub fn set_fill_style(this: &CanvasRenderingContext2d, value: &::wasm_bindgen::JsValue);
+    # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = fillStyle)]
+    #[doc = "Setter for the `fillStyle` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
+    pub fn set_fill_style_str(this: &CanvasRenderingContext2d, value: &str);
+    #[cfg(feature = "CanvasGradient")]
+    # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = fillStyle)]
+    #[doc = "Setter for the `fillStyle` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CanvasGradient`, `CanvasRenderingContext2d`*"]
+    pub fn set_fill_style_canvas_gradient(this: &CanvasRenderingContext2d, value: &CanvasGradient);
+    #[cfg(feature = "CanvasPattern")]
+    # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = fillStyle)]
+    #[doc = "Setter for the `fillStyle` field of this object."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/fillStyle)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CanvasPattern`, `CanvasRenderingContext2d`*"]
+    pub fn set_fill_style_canvas_pattern(this: &CanvasRenderingContext2d, value: &CanvasPattern);
     # [wasm_bindgen (structural , method , getter , js_class = "CanvasRenderingContext2D" , js_name = filter)]
     #[doc = "Getter for the `filter` field of this object."]
     #[doc = ""]
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/filter)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
-    pub fn filter(this: &CanvasRenderingContext2d) -> String;
+    pub fn filter(this: &CanvasRenderingContext2d) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = filter)]
     #[doc = "Setter for the `filter` field of this object."]
     #[doc = ""]
@@ -127,7 +180,7 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineCap)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
-    pub fn line_cap(this: &CanvasRenderingContext2d) -> String;
+    pub fn line_cap(this: &CanvasRenderingContext2d) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = lineCap)]
     #[doc = "Setter for the `lineCap` field of this object."]
     #[doc = ""]
@@ -141,7 +194,7 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/lineJoin)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
-    pub fn line_join(this: &CanvasRenderingContext2d) -> String;
+    pub fn line_join(this: &CanvasRenderingContext2d) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = lineJoin)]
     #[doc = "Setter for the `lineJoin` field of this object."]
     #[doc = ""]
@@ -225,7 +278,7 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/shadowColor)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
-    pub fn shadow_color(this: &CanvasRenderingContext2d) -> String;
+    pub fn shadow_color(this: &CanvasRenderingContext2d) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = shadowColor)]
     #[doc = "Setter for the `shadowColor` field of this object."]
     #[doc = ""]
@@ -239,7 +292,7 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/font)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
-    pub fn font(this: &CanvasRenderingContext2d) -> String;
+    pub fn font(this: &CanvasRenderingContext2d) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = font)]
     #[doc = "Setter for the `font` field of this object."]
     #[doc = ""]
@@ -253,7 +306,7 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textAlign)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
-    pub fn text_align(this: &CanvasRenderingContext2d) -> String;
+    pub fn text_align(this: &CanvasRenderingContext2d) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = textAlign)]
     #[doc = "Setter for the `textAlign` field of this object."]
     #[doc = ""]
@@ -267,7 +320,7 @@ extern "C" {
     #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/textBaseline)"]
     #[doc = ""]
     #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`*"]
-    pub fn text_baseline(this: &CanvasRenderingContext2d) -> String;
+    pub fn text_baseline(this: &CanvasRenderingContext2d) -> ::alloc::string::String;
     # [wasm_bindgen (structural , method , setter , js_class = "CanvasRenderingContext2D" , js_name = textBaseline)]
     #[doc = "Setter for the `textBaseline` field of this object."]
     #[doc = ""]
@@ -386,23 +439,6 @@ extern "C" {
         dx: f64,
         dy: f64,
     ) -> Result<(), JsValue>;
-    #[cfg(web_sys_unstable_apis)]
-    #[cfg(feature = "VideoFrame")]
-    # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = drawImage)]
-    #[doc = "The `drawImage()` method."]
-    #[doc = ""]
-    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage)"]
-    #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`, `VideoFrame`*"]
-    #[doc = ""]
-    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    pub fn draw_image_with_video_frame(
-        this: &CanvasRenderingContext2d,
-        image: &VideoFrame,
-        dx: f64,
-        dy: f64,
-    ) -> Result<(), JsValue>;
     #[cfg(feature = "HtmlImageElement")]
     # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = drawImage)]
     #[doc = "The `drawImage()` method."]
@@ -488,25 +524,6 @@ extern "C" {
     pub fn draw_image_with_offscreen_canvas_and_dw_and_dh(
         this: &CanvasRenderingContext2d,
         image: &OffscreenCanvas,
-        dx: f64,
-        dy: f64,
-        dw: f64,
-        dh: f64,
-    ) -> Result<(), JsValue>;
-    #[cfg(web_sys_unstable_apis)]
-    #[cfg(feature = "VideoFrame")]
-    # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = drawImage)]
-    #[doc = "The `drawImage()` method."]
-    #[doc = ""]
-    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage)"]
-    #[doc = ""]
-    #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`, `VideoFrame`*"]
-    #[doc = ""]
-    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
-    pub fn draw_image_with_video_frame_and_dw_and_dh(
-        this: &CanvasRenderingContext2d,
-        image: &VideoFrame,
         dx: f64,
         dy: f64,
         dw: f64,
@@ -636,7 +653,43 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`, `VideoFrame`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn draw_image_with_video_frame(
+        this: &CanvasRenderingContext2d,
+        image: &VideoFrame,
+        dx: f64,
+        dy: f64,
+    ) -> Result<(), JsValue>;
+    #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "VideoFrame")]
+    # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = drawImage)]
+    #[doc = "The `drawImage()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`, `VideoFrame`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn draw_image_with_video_frame_and_dw_and_dh(
+        this: &CanvasRenderingContext2d,
+        image: &VideoFrame,
+        dx: f64,
+        dy: f64,
+        dw: f64,
+        dh: f64,
+    ) -> Result<(), JsValue>;
+    #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "VideoFrame")]
+    # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = drawImage)]
+    #[doc = "The `drawImage()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`, `VideoFrame`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn draw_image_with_video_frame_and_sw_and_sh_and_dx_and_dy_and_dw_and_dh(
         this: &CanvasRenderingContext2d,
         image: &VideoFrame,
@@ -911,7 +964,7 @@ extern "C" {
     #[doc = "*This API requires the following crate features to be activated: `CanvasPattern`, `CanvasRenderingContext2d`, `VideoFrame`*"]
     #[doc = ""]
     #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
-    #[doc = "[described in the `wasm-bindgen` guide](https://rustwasm.github.io/docs/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
     pub fn create_pattern_with_video_frame(
         this: &CanvasRenderingContext2d,
         image: &VideoFrame,
@@ -988,6 +1041,7 @@ extern "C" {
         this: &CanvasRenderingContext2d,
         imagedata: &ImageData,
     ) -> Result<ImageData, JsValue>;
+    #[cfg(not(web_sys_unstable_apis))]
     #[cfg(feature = "ImageData")]
     # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = getImageData)]
     #[doc = "The `getImageData()` method."]
@@ -1002,6 +1056,25 @@ extern "C" {
         sw: f64,
         sh: f64,
     ) -> Result<ImageData, JsValue>;
+    #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "ImageData")]
+    # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = getImageData)]
+    #[doc = "The `getImageData()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/getImageData)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`, `ImageData`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn get_image_data(
+        this: &CanvasRenderingContext2d,
+        sx: i32,
+        sy: i32,
+        sw: i32,
+        sh: i32,
+    ) -> Result<ImageData, JsValue>;
+    #[cfg(not(web_sys_unstable_apis))]
     #[cfg(feature = "ImageData")]
     # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = putImageData)]
     #[doc = "The `putImageData()` method."]
@@ -1015,6 +1088,7 @@ extern "C" {
         dx: f64,
         dy: f64,
     ) -> Result<(), JsValue>;
+    #[cfg(not(web_sys_unstable_apis))]
     #[cfg(feature = "ImageData")]
     # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = putImageData)]
     #[doc = "The `putImageData()` method."]
@@ -1031,6 +1105,44 @@ extern "C" {
         dirty_y: f64,
         dirty_width: f64,
         dirty_height: f64,
+    ) -> Result<(), JsValue>;
+    #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "ImageData")]
+    # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = putImageData)]
+    #[doc = "The `putImageData()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`, `ImageData`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn put_image_data(
+        this: &CanvasRenderingContext2d,
+        imagedata: &ImageData,
+        dx: i32,
+        dy: i32,
+    ) -> Result<(), JsValue>;
+    #[cfg(web_sys_unstable_apis)]
+    #[cfg(feature = "ImageData")]
+    # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = putImageData)]
+    #[doc = "The `putImageData()` method."]
+    #[doc = ""]
+    #[doc = "[MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/putImageData)"]
+    #[doc = ""]
+    #[doc = "*This API requires the following crate features to be activated: `CanvasRenderingContext2d`, `ImageData`*"]
+    #[doc = ""]
+    #[doc = "*This API is unstable and requires `--cfg=web_sys_unstable_apis` to be activated, as"]
+    #[doc = "[described in the `wasm-bindgen` guide](https://wasm-bindgen.github.io/wasm-bindgen/web-sys/unstable-apis.html)*"]
+    pub fn put_image_data_with_dirty_x_and_dirty_y_and_dirty_width_and_dirty_height(
+        this: &CanvasRenderingContext2d,
+        imagedata: &ImageData,
+        dx: i32,
+        dy: i32,
+        dirty_x: i32,
+        dirty_y: i32,
+        dirty_width: i32,
+        dirty_height: i32,
     ) -> Result<(), JsValue>;
     # [wasm_bindgen (catch , method , structural , js_class = "CanvasRenderingContext2D" , js_name = arc)]
     #[doc = "The `arc()` method."]

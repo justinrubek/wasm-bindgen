@@ -1,6 +1,6 @@
 # Announcing `wasm-bindgen` $TODO_VERSION
 
-`wasm-bindgen` facilitates high-level interactions between wasm modules and
+`wasm-bindgen` facilitates high-level interactions between Wasm modules and
 JavaScript.
 
 * [GitHub][]
@@ -31,9 +31,9 @@ guide][contributing] and take a look at some of these issues:
 * [Issues labeled "good first issue"][good-first-issue]
 * [Issues labeled "help wanted"][help-wanted]
 
-[GitHub]: https://github.com/rustwasm/wasm-bindgen
+[GitHub]: https://github.com/wasm-bindgen/wasm-bindgen
 [crates.io]: https://crates.io/crates/wasm-bindgen
-[guide]: https://rustwasm.github.io/wasm-bindgen
-[contributing]: https://rustwasm.github.io/wasm-bindgen/contributing.md
-[good-first-issue]: https://github.com/rustwasm/wasm-bindgen/labels/good%20first%20issue
-[help-wanted]: https://github.com/rustwasm/wasm-bindgen/labels/help%20wanted
+[guide]: https://wasm-bindgen.github.io/wasm-bindgen
+[contributing]: https://wasm-bindgen.github.io/wasm-bindgen/contributing.md
+[good-first-issue]: https://github.com/wasm-bindgen/wasm-bindgen/labels/good%20first%20issue
+[help-wanted]: https://github.com/wasm-bindgen/wasm-bindgen/labels/help%20wanted

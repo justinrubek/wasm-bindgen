@@ -1,9 +1,9 @@
 [package]
-name = "wasm-bindgen-test-crate-a"
-version = "0.1.0"
 authors = ["The wasm-bindgen Developers"]
-license = "MIT/Apache-2.0"
-description = "internal test crate for wasm-bindgen"
+edition = "2021"
+name = "wasm-bindgen-test-crate-a"
+publish = false
+version = "0.0.0"
 
 [dependencies]
-wasm-bindgen = { path = '../../..', version = '0.2' }
+wasm-bindgen = { path = '../../..' }

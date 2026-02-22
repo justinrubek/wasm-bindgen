@@ -1,7 +1,7 @@
 use crate::intrinsic::Intrinsic;
 use crate::wit::AdapterId;
 use std::borrow::Cow;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::path::PathBuf;
 use walrus::TypedCustomSectionId;
 
@@ -13,7 +13,7 @@ use walrus::TypedCustomSectionId;
 pub struct WasmBindgenAux {
     /// Extra typescript annotations that should be appended to the generated
     /// TypeScript file. This is provided via a custom attribute in Rust code.
-    pub extra_typescript: String,
+    pub extra_typescript: Vec<String>,
 
     /// A map from identifier to the contents of each local module defined via
     /// the `#[wasm_bindgen(module = "/foo.js")]` import options.
@@ -21,7 +21,7 @@ pub struct WasmBindgenAux {
 
     /// A map from unique crate identifier to the list of inline JS snippets for
     /// that crate identifier.
-    pub snippets: HashMap<String, Vec<String>>,
+    pub snippets: BTreeMap<String, Vec<String>>,
 
     /// A list of all `package.json` files that are intended to be included in
     /// the final build.
@@ -34,6 +34,9 @@ pub struct WasmBindgenAux {
     /// A map from imported function id to what it's expected to import.
     pub import_map: HashMap<AdapterId, AuxImport>,
 
+    /// List of imports that should be re-exported, keyed by reexport name.
+    pub reexports: BTreeMap<String, JsImport>,
+
     /// Small bits of metadata about imports.
     pub imports_with_catch: HashSet<AdapterId>,
     pub imports_with_variadic: HashSet<AdapterId>,
@@ -42,6 +45,9 @@ pub struct WasmBindgenAux {
     /// Auxiliary information to go into JS/TypeScript bindings describing the
     /// exported enums from Rust.
     pub enums: HashMap<String, AuxEnum>,
+    /// Auxiliary information to go into JS/TypeScript bindings describing the
+    /// exported string enums from Rust.
+    pub string_enums: HashMap<String, AuxStringEnum>,
 
     /// Auxiliary information to go into JS/TypeScript bindings describing the
     /// exported structs from Rust and their fields they've got exported.
@@ -57,8 +63,13 @@ pub struct WasmBindgenAux {
 
     /// Various intrinsics used for JS glue generation
     pub exn_store: Option<walrus::FunctionId>,
-    pub shadow_stack_pointer: Option<walrus::GlobalId>,
+    pub stack_pointer: Option<walrus::GlobalId>,
     pub thread_destroy: Option<walrus::FunctionId>,
+
+    /// The imported JSTag for catching JavaScript exceptions in Wasm.
+    /// When this is `Some`, all imports with `catch` use Wasm catch wrappers
+    /// instead of JS `handleError` wrappers.
+    pub js_tag: Option<walrus::TagId>,
 }
 
 pub type WasmBindgenAuxId = TypedCustomSectionId<WasmBindgenAux>;
@@ -70,32 +81,49 @@ pub struct AuxExport {
     pub debug_name: String,
     /// Comments parsed in Rust and forwarded here to show up in JS bindings.
     pub comments: String,
-    /// Argument names in Rust forwarded here to configure the names that show
-    /// up in TypeScript bindings.
-    pub arg_names: Option<Vec<String>>,
+    /// Function's argument info in Rust forwarded here to configure the signature
+    /// that shows up in bindings.
+    pub args: Option<Vec<AuxFunctionArgumentData>>,
     /// Whether this is an async function, to configure the TypeScript return value.
     pub asyncness: bool,
     /// What kind of function this is and where it shows up
     pub kind: AuxExportKind,
+    /// The namespace to export the item through, if any
+    pub js_namespace: Option<Vec<String>>,
     /// Whether typescript bindings should be generated for this export.
     pub generate_typescript: bool,
     /// Whether jsdoc comments should be generated for this export.
     pub generate_jsdoc: bool,
     /// Whether typescript bindings should be generated for this export.
     pub variadic: bool,
+    /// Function's return overriding type
+    pub fn_ret_ty_override: Option<String>,
+    /// Function's return description
+    pub fn_ret_desc: Option<String>,
 }
 
-/// All possible kinds of exports from a wasm module.
+/// Information about a functions' argument
+#[derive(Debug, Clone)]
+pub struct AuxFunctionArgumentData {
+    /// Specifies the argument name
+    pub name: String,
+    /// Specifies the function argument type override
+    pub ty_override: Option<String>,
+    /// Specifies the argument description
+    pub desc: Option<String>,
+}
+
+/// All possible kinds of exports from a Wasm module.
 ///
-/// This `enum` says where to place an exported wasm function. For example it
+/// This `enum` says where to place an exported Wasm function. For example it
 /// may want to get hooked up to a JS class, or it may want to be exported as a
 /// free function (etc).
 ///
 /// TODO: it feels like this should not really be here per se. We probably want
-/// to either construct the JS object itself from within wasm or somehow move
+/// to either construct the JS object itself from within Wasm or somehow move
 /// more of this information into some other section. Really what this is is
 /// sort of an "export map" saying how to wire up all the free functions from
-/// the wasm module into the output expected JS module. All our functions here
+/// the Wasm module into the output expected JS module. All our functions here
 /// currently take integer parameters and require a JS wrapper, but ideally
 /// we'd change them one day to taking/receiving `externref` which then use some
 /// sort of webidl import to customize behavior or something like that. In any
@@ -105,6 +133,9 @@ pub struct AuxExport {
 pub enum AuxExportKind {
     /// A free function that's just listed on the exported module
     Function(String),
+
+    /// A free function that receives JS `this` as its first parameter
+    FunctionThis(String),
 
     /// A function that's used to create an instance of a class. The function
     /// actually return just an integer which is put on an JS object currently.
@@ -167,9 +198,30 @@ pub struct AuxEnum {
     pub comments: String,
     /// A list of variants with their name, value and comments
     /// and whether typescript bindings should be generated for each variant
-    pub variants: Vec<(String, u32, String)>,
+    pub variants: Vec<(String, i64, String)>,
     /// Whether typescript bindings should be generated for this enum.
     pub generate_typescript: bool,
+    /// Whether to not export this enum from the module exports
+    pub private: bool,
+    /// The namespace to export the enum through, if any
+    pub js_namespace: Option<Vec<String>>,
+}
+
+#[derive(Debug)]
+pub struct AuxStringEnum {
+    /// The name of this enum
+    pub name: String,
+    /// The copied Rust comments to forward to JS
+    pub comments: String,
+    /// A list of variants values
+    pub variant_values: Vec<String>,
+    /// Whether typescript bindings should be generated for this enum.
+    pub generate_typescript: bool,
+    /// The namespace to export the enum through, if any
+    /// Note: Currently unused as string enums don't generate exports,
+    /// but kept for consistency and potential future use.
+    #[allow(dead_code)]
+    pub js_namespace: Option<Vec<String>>,
 }
 
 #[derive(Debug)]
@@ -182,9 +234,13 @@ pub struct AuxStruct {
     pub is_inspectable: bool,
     /// Whether typescript bindings should be generated for this struct.
     pub generate_typescript: bool,
+    /// Whether to not export this struct from the module exports
+    pub private: bool,
+    /// The namespace to export the struct through, if any
+    pub js_namespace: Option<Vec<String>>,
 }
 
-/// All possible types of imports that can be imported by a wasm module.
+/// All possible types of imports that can be imported by a Wasm module.
 ///
 /// This `enum` is intended to map out what an imported value is. For example
 /// this contains a ton of shims and various ways you can call a function. The
@@ -193,7 +249,8 @@ pub struct AuxStruct {
 ///
 /// Note that this is *not* the same as the webidl bindings section. This is
 /// intended to be coupled with that to map out what actually gets hooked up to
-/// an import in the wasm module. The two work in tandem.
+/// an import in the Wasm module. The two work in tandem.
+/// Represents the source of a re-export.
 ///
 /// Some of these items here are native to JS (like `Value`, indexing
 /// operations, etc). Others are shims generated by wasm-bindgen (like `Closure`
@@ -218,16 +275,13 @@ pub enum AuxImport {
 
     /// This import is expected to be a shim that returns the JS value named by
     /// `JsImport`.
-    Static(JsImport),
+    Static { js: JsImport, optional: bool },
 
-    /// This import is intended to manufacture a JS closure with the given
-    /// signature and then return that back to Rust.
-    Closure {
-        mutable: bool,      // whether or not this was a `FnMut` closure
-        dtor: u32,          // table element index of the destructor function
-        adapter: AdapterId, // the adapter which translates the types for this closure
-        nargs: usize,
-    },
+    /// This import is expected to be a shim that returns an exported `JsString`.
+    String(String),
+
+    /// This import is a generic cast function, monomorphised for a specific `fn(A) -> R` signature.
+    Cast { sig_comment: String },
 
     /// This import is expected to be a shim that simply calls the `foo` method
     /// on the first object, passing along all other parameters and returning
@@ -410,7 +464,7 @@ impl walrus::CustomSection for WasmBindgenAux {
         "wasm-bindgen custom section"
     }
 
-    fn data(&self, _: &walrus::IdsToIndices) -> Cow<[u8]> {
+    fn data(&self, _: &walrus::IdsToIndices) -> Cow<'_, [u8]> {
         panic!("shouldn't emit custom sections just yet");
     }
 
@@ -430,11 +484,14 @@ impl walrus::CustomSection for WasmBindgenAux {
         if let Some(id) = self.exn_store {
             roots.push_func(id);
         }
-        if let Some(id) = self.shadow_stack_pointer {
+        if let Some(id) = self.stack_pointer {
             roots.push_global(id);
         }
         if let Some(id) = self.thread_destroy {
             roots.push_func(id);
+        }
+        if let Some(id) = self.js_tag {
+            roots.push_tag(id);
         }
     }
 }

@@ -1,7 +1,7 @@
 # Introduction
 
 This book is about `wasm-bindgen`, a Rust library and CLI tool that facilitate
-high-level interactions between wasm modules and JavaScript. The `wasm-bindgen`
+high-level interactions between Wasm modules and JavaScript. The `wasm-bindgen`
 tool and crate are only one part of the [Rust and WebAssembly
 ecosystem][rustwasm]. If you're not familiar already with `wasm-bindgen` it's
 recommended to start by reading the [Game of Life tutorial][gol]. If you're
@@ -34,9 +34,9 @@ the web locally, publishing it as part of a larger application, or even
 publishing Rust-compiled-to-WebAssembly on NPM!
 
 [component-model]: https://github.com/WebAssembly/component-model
-[dom-ex]: https://github.com/rustwasm/wasm-bindgen/tree/master/examples/dom
-[console-log]: https://github.com/rustwasm/wasm-bindgen/tree/master/examples/console_log
-[perf-ex]: https://github.com/rustwasm/wasm-bindgen/tree/master/examples/performance
+[dom-ex]: https://github.com/wasm-bindgen/wasm-bindgen/tree/master/examples/dom
+[console-log]: https://github.com/wasm-bindgen/wasm-bindgen/tree/master/examples/console_log
+[perf-ex]: https://github.com/wasm-bindgen/wasm-bindgen/tree/master/examples/performance
 [hello-online]: https://webassembly.studio/?f=gzubao6tg3
 [rustwasm]: https://rustwasm.github.io/
 [gol]: https://rustwasm.github.io/docs/book/

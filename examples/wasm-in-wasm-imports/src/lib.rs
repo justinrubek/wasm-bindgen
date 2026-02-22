@@ -23,7 +23,7 @@ macro_rules! console_error {
 const WASM: &[u8] = include_bytes!("native_add.wasm");
 
 async fn run_async() -> Result<(), JsValue> {
-    console_log!("instantiating a new wasm module directly");
+    console_log!("instantiating a new Wasm module directly");
 
     let imports = make_imports()?;
     let a = JsFuture::from(WebAssembly::instantiate_buffer(WASM, &imports)).await?;
@@ -45,7 +45,7 @@ async fn run_async() -> Result<(), JsValue> {
 fn bind(this: &JsValue, func_name: &str) -> Result<(), JsValue> {
     let property_key = JsValue::from(func_name);
     let orig_func = Reflect::get(this, &property_key)?.dyn_into::<Function>()?;
-    let func = orig_func.bind(this);
+    let func = orig_func.bind0(this);
     if !Reflect::set(this, &property_key, &func)? {
         return Err(JsValue::from("failed to set property"));
     }

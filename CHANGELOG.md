@@ -5,6 +5,951 @@
 
 ### Added
 
+### Changed
+
+### Fixed
+
+* Restored backwards compatibility for breaking changes introduced in 0.2.110:
+  re-added deprecated `Promise::then2` binding, reverted `Promise::all_settled`
+  stable signature to take `&JsValue` instead of owned `Object`, and added
+  default type parameters (`= JsValue`) to `ArrayIntoIter`, `ArrayIter`, and
+  `Iter` structs.
+  [#4979](https://github.com/wasm-bindgen/wasm-bindgen/pull/4979)
+
+### Removed
+
+## [0.2.109](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.108...0.2.109)
+
+### Added
+
+### Changed
+
+* Refactor new closure methods - ensures that all closure constructor functions have the variants `Closure::foo()`, `Closure::foo_aborting()` and
+  `Closure::foo_assert_unwind_safe()` this then fully allows switching from the UnwindSafe bound now being applies on foo() to use one of the
+  alternatives, given these limitations of AssertUnwindSafe. The same applies to `ImmediateClosure`. In addition, mutable reentrancy guards are
+  added for `ImmediateClosure`, and it is updated to be pass-by-value as well.
+  [#4975](https://github.com/wasm-bindgen/wasm-bindgen/pull/4975)
+
+### Fixed
+
+* Fixed a regression where Array.of1,... variants using generic `Array<T>` broke inference.
+  Reverted to use non-generic JsValue arguments. In addition extends generic class hoisting to
+  for constructors to also include `static_method_of` methods returning the own type, to allow
+  `Array::of` generic to now be on the `Array<T>` impl block.
+  [#4974](https://github.com/wasm-bindgen/wasm-bindgen/pull/4974)
+
+## [0.2.109](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.108...0.2.109)
+
+### Added
+
+* Added support for erasable generic type parameters on imported JavaScript types,
+  using sound type erasure in JS bindgen boundary. Includes updated js-sys bindings
+  with generic implementations for many standard JS types and functions including
+  `Array<T>`, `Promise<T>`, `Map<K, V>`, `Iterator<T>`, and more.
+  [#4876](https://github.com/wasm-bindgen/wasm-bindgen/pull/4876)
+
+* Added `ScopedClosure<'a, T>` as a unified closure type with lifetime parameter. `ScopedClosure::borrow(&f)` (for immutable `Fn`) and `ScopedClosure::borrow_mut(&mut f)` (for mutable `FnMut`) create borrowed closures that can capture non-`'static` references, ideal for immediate/synchronous JS callbacks. `Closure<T>` is now a type alias for `ScopedClosure<'static, T>`, maintaining backwards compatibility. Also added `IntoWasmAbi` implementation for `Closure<T>` enabling pass-by-value ownership transfer to JavaScript.
+
+* Added `ImmediateClosure<'a, T>` as a lightweight, unwind-safe replacement for
+  `&dyn FnMut` in immediate/synchronous callbacks. Unlike `ScopedClosure`, it has
+  no JS call on creation, no JS call on drop, and no GC overhead—the same ABI as
+  `&dyn FnMut` but with panic safety. Use `ImmediateClosure::new(&f)` for
+  immutable `Fn` closures (easier to satisfy unwind safety) or `ImmediateClosure::new_mut(&mut f)` for
+  mutable `FnMut` closures. Closure parameter types are automatically inferred from context.
+  Also implements `From<&ImmediateClosure<T>> for ScopedClosure<T>` for API migration.
+  [#4950](https://github.com/wasm-bindgen/wasm-bindgen/issues/4950)
+
+* Implement `#[wasm_bindgen(catch)]` exception handling directly in Wasm using
+  `WebAssembly.JSTag` when Wasm exception handling is available. This generates
+  smaller and faster code by avoiding JavaScript `handleError` wrapper functions.
+  [#4942](https://github.com/wasm-bindgen/wasm-bindgen/pull/4942)
+
+* Add Node.js `worker_threads` support for atomics builds. When targeting Node.js with atomics enabled, wasm-bindgen now generates `initSync({ module, memory, thread_stack_size })` and `__wbg_get_imports(memory)` functions that allow worker threads to initialize with a shared WebAssembly.Memory and pre-compiled module. Auto-initialization occurs only on the main thread for backwards compatibility.
+
+* Added a panic message when a getter has more than one argument. 
+  [#4936](https://github.com/wasm-bindgen/wasm-bindgen/pull/4936)
+
+* Added support for WebIDL namespace attributes in `wasm-bindgen-webidl`. This enables
+  APIs like the CSS Custom Highlight API which adds the `highlights` attribute to the `CSS` namespace.
+  [#4930](https://github.com/wasm-bindgen/wasm-bindgen/issues/4930)
+
+* Added stable `ShowPopoverOptions` dictionary and `show_popover_with_options()` method to
+  `HtmlElement`, and unstable `TogglePopoverOptions` dictionary per the WHATWG HTML spec.
+  [#4968](https://github.com/wasm-bindgen/wasm-bindgen/pull/4968)
+
+* Added unstable Geolocation API types per the latest W3C spec: `GeolocationCoordinates`,
+  `GeolocationPosition`, and `GeolocationPositionError`. The `Geolocation` interface now
+  has both stable methods (using the old `Position`/`PositionError` types with `[Throws]`)
+  and unstable methods (using the new types without `[Throws]}`, matching actual browser behavior).
+  [#2578](https://github.com/AbesBend662/AbesBend662.github.io/pull/2578)
+
+* Added `matrixTransform()` method to `DOMPointReadOnly` in `web-sys`.
+  [#4962](https://github.com/wasm-bindgen/wasm-bindgen/pull/4962)
+
+* Added the `web` and `node` targets to the `--experimental-reset-state-function` flag.
+  [#4909](https://github.com/wasm-bindgen/wasm-bindgen/pull/4909)
+
+* Added `oncancel` event handler to `GlobalEventHandlers` (available on `HtmlElement`,
+  `Document`, `Window`, etc.).
+  [#4542](https://github.com/wasm-bindgen/wasm-bindgen/pull/4542)
+
+* Added `CommandEvent` and `CommandEventInit` from the Invoker Commands API.
+  [#4552](https://github.com/wasm-bindgen/wasm-bindgen/pull/4552)
+
+* Added `AbstractRange`, `StaticRange`, and `StaticRangeInit` interfaces.
+  [#4221](https://github.com/wasm-bindgen/wasm-bindgen/pull/4221)
+
+* Updated WebCodecs API to Working Draft 2026-01-29 and MediaRecorder API to 2025-04-17.
+  Added `rotation` and `flip` to `VideoDecoderConfig`.
+  [#4411](https://github.com/wasm-bindgen/wasm-bindgen/pull/4411)
+
+* Added support for unstable WebIDL to override stable attribute types, allowing
+  corrected type signatures behind `web_sys_unstable_apis`. Applied to `MouseEvent`
+  coordinate attributes (`clientX`, `clientY`, `screenX`, `screenY`, `offsetX`,
+  `offsetY`, `pageX`, `pageY`) which now return `f64` instead of `i32` when
+  unstable APIs are enabled, per the CSSOM View spec draft.
+  [#4935](https://github.com/wasm-bindgen/wasm-bindgen/pull/4935)
+
+* Added support for unstable WebIDL to override stable method return types. This
+  enables User Timing Level 3 APIs where `Performance.mark()` and `Performance.measure()`
+  return `PerformanceMark` and `PerformanceMeasure` respectively (instead of `undefined`)
+  when `web_sys_unstable_apis` is enabled. Also added `PerformanceMarkOptions`,
+  `PerformanceMeasureOptions`, and the `detail` attribute on marks/measures.
+  [#3734](https://github.com/wasm-bindgen/wasm-bindgen/pull/3734)
+
+* Added non-standard `mode` option for `FileSystemFileHandle.createSyncAccessHandle()`.
+  Also improved WebIDL generator to track stability at the signature level, allowing
+  stable methods to have unstable overloads.
+  [#4928](https://github.com/wasm-bindgen/wasm-bindgen/issues/4928)
+
+* Updated WebGPU bindings to the February 2026 spec. Dictionary fields with union
+  types now generate multiple type-safe setters (e.g. `set_resource_gpu_sampler()`,
+  `set_resource_gpu_texture_view()`) alongside a deprecated fallback setter. Sequence
+  arguments in unstable APIs now use typed slices (`&[T]`) instead of `&JsValue`.
+  Fixed inner string enum types to use `JsString` in generic positions, added `BigInt`
+  to builtin identifiers, and fixed dictionary field feature gates to not over-constrain
+  getters with setter type requirements.
+  [#4955](https://github.com/wasm-bindgen/wasm-bindgen/pull/4955)
+
+* Improved dictionary union type expansion: stable fallback setters are no longer
+  deprecated, and unstable builder methods now use the first typed variant instead
+  of `&JsValue`. Dictionaries with required union fields now generate expanded
+  constructors for each variant (e.g. `new()`, `new_with_gpu_texture_view()`),
+  with duplicate-signature variants elided.
+  [#4966](https://github.com/wasm-bindgen/wasm-bindgen/pull/4966)
+
+### Changed
+
+* Increased externref stack size from 128 to 1024 slots to prevent "table index is out of bounds"
+  errors in applications with deep call stacks or many concurrent async operations.
+  [#4951](https://github.com/wasm-bindgen/wasm-bindgen/pull/4951)
+
+* `Closure::new()`, `Closure::once()`, and related methods now require `UnwindSafe` bounds on closures when building with `panic=unwind`. New `_aborting` variants (`new_aborting()`, `once_aborting()`, etc.) are provided for closures that don't need panic catching and want to avoid the `UnwindSafe` requirement.
+  [#4893](https://github.com/wasm-bindgen/wasm-bindgen/pull/4893)
+
+* `global` does not use the unsafe-eval `new Function` trick anymore allowing to have CSP strict compliant packages with `wasm-bindgen`.
+  [#4910](https://github.com/wasm-bindgen/wasm-bindgen/pull/4910)
+
+* `eval` and `Function` constructors are now gated behind the `unsafe-eval` feature.
+  [#4914](https://github.com/wasm-bindgen/wasm-bindgen/pull/4914)
+
+### Fixed
+
+* Fixed incorrect JS export names when LLVM merges identical functions at `opt-level >= 2`.
+  [#4946](https://github.com/wasm-bindgen/wasm-bindgen/issues/4946)
+
+* Fixed incorrect `Closure` adapter deduplication when wasm-ld's Identical Code Folding merges
+  invoke functions for different closure types into the same export.
+  [#4953](https://github.com/wasm-bindgen/wasm-bindgen/issues/4953)
+
+* Fixed `ReferenceError` when using Rust struct names that conflict with JS builtins (e.g., `Array`).
+  The constructor now correctly uses the aliased `FinalizationRegistry` identifier.
+  [#4932](https://github.com/wasm-bindgen/wasm-bindgen/pull/4932)
+
+* Fixed `Element::scroll_top()`, `Element::scroll_left()`, and `HtmlElement::scroll_top()`
+  to return `f64` instead of `i32` per the CSSOM View spec, behind `web_sys_unstable_apis`.
+  The stable API is unchanged for backwards compatibility.
+  [#4525](https://github.com/wasm-bindgen/wasm-bindgen/issues/4525)
+
+* Added spec-compliant `i32` parameter types for `CanvasRenderingContext2d::get_image_data()`
+  and `put_image_data()` (and `OffscreenCanvasRenderingContext2d` equivalents) behind
+  `web_sys_unstable_apis`. Per the HTML spec, `getImageData` and `putImageData` use `long`
+  (i32) for coordinates, not `double` (f64). The stable API is unchanged for backwards
+  compatibility.
+  [#1920](https://github.com/wasm-bindgen/wasm-bindgen/pull/1920)
+
+* Fixed incorrect `#[cfg(web_sys_unstable_apis)]` gating on stable method signatures that
+  share a WebIDL operation with unstable overloads. For example, `Clipboard.read()` (0 args)
+  was incorrectly gated as unstable because the unstable `read(options)` overload existed.
+  The WebIDL code generator now uses an authoritative expansion model where stable and unstable
+  signature sets are built independently and compared: identical signatures merge (no gate),
+  stable-only signatures get `not(unstable)`, and unstable-only signatures get `unstable`.
+  Also adds typed generics (`Promise<T>`, `Array<T>`, `Function<fn(...)>`, etc.) to all
+  unstable API methods, and adds missing `PhotoCapabilities`, `PhotoSettings`,
+  `MediaSettingsRange`, `Point2D`, `RedEyeReduction`, `FillLightMode`, and `MeteringMode`
+  types from the W3C Image Capture spec.
+  [#4964](https://github.com/wasm-bindgen/wasm-bindgen/pull/4964)
+
+* Fixed `unfulfilled_lint_expectations` warnings when using `#[expect(...)]` attributes
+  on functions annotated with `#[wasm_bindgen]`. The `#[expect]` attributes are now
+  converted to `#[allow]` in generated code to prevent spurious warnings.
+  [#4409](https://github.com/wasm-bindgen/wasm-bindgen/pull/4409)
+
+## [0.2.108](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.107...0.2.108)
+
+### Fixed
+
+* Fixed regression where `panic=unwind` builds for non-Wasm targets would trigger `UnwindSafe` assertions.
+  [#4903](https://github.com/wasm-bindgen/wasm-bindgen/pull/4903)
+
+## [0.2.107](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.106...0.2.107)
+
+### Added
+
+* Support catching panics, and raising JS Exceptions for them, when building
+  with panic=unwind on nightly, with the `std` feature.
+  [#4790](https://github.com/wasm-bindgen/wasm-bindgen/pull/4790)
+
+* Added support for passing `&[JsValue]` slices from Rust to JavaScript functions.
+  [#4872](https://github.com/wasm-bindgen/wasm-bindgen/pull/4872)
+
+* Added `private` attribute on exported types to allow generating
+  exports and structs as implicit internal exported types for function
+  arguments and returns, without exporting them on the public interface.
+  [#4788](https://github.com/wasm-bindgen/wasm-bindgen/pull/4788)
+
+* Added `iter_custom` and `iter_custom_future` for bench to do custom measurements.
+  [#4841](https://github.com/wasm-bindgen/wasm-bindgen/pull/4841)
+
+* Added [Window Management API](https://w3c.github.io/window-management/).
+  [#4843](https://github.com/wasm-bindgen/wasm-bindgen/pull/4843)
+
+### Changed
+
+* Changed WASM import namespace from `wbg` to `./{name}_bg.js` for `web` and `no-modules` targets,
+  aligning with `bundler` and `experimental-nodejs-module` to enable cross-target WASM sharing.
+  [#4850](https://github.com/rustwasm/wasm-bindgen/pull/4850)
+
+* Replace `WASM_BINDGEN_UNSTABLE_TEST_PROFRAW_OUT` and `WASM_BINDGEN_UNSTABLE_TEST_PROFRAW_PREFIX` with parsing `LLVM_PROFILE_FILE` analogous to Rust test coverage.
+  [#4367](https://github.com/wasm-bindgen/wasm-bindgen/pull/4367)
+
+* Typescript custom sections sorted alphabetically across codegen-units.
+  [#4738](https://github.com/wasm-bindgen/wasm-bindgen/pull/4738)
+
+* Optimized demangling performance by removing redundant string formatting
+  [#4867](https://github.com/wasm-bindgen/wasm-bindgen/pull/4867)
+
+* Changed WASM import namespace from `__wbindgen_placeholder__` to `./{name}_bg.js` for `node` targets, aligning with `bundler` and `experimental-nodejs-module` to enable cross-target WASM sharing.
+  [#4869](https://github.com/rustwasm/wasm-bindgen/pull/4869)
+
+* Changed WASM import namespace from `__wbindgen_placeholder__` to `./{name}_bg.js` for `deno` and `module` targets, aligning with `node`, `bundler` and `experimental-nodejs-module` to enable cross-target WASM sharing.
+  [#4871](https://github.com/rustwasm/wasm-bindgen/pull/4871)
+
+* Consolidate JavaScript glue generation
+  Move target-specific JS emission into a single finalize phase, reducing
+  branching and making the generated output more consistent across targets.
+  - Centralize JS output assembly in a single finalize phase (exports/imports/wasm loading).
+  - Make `--target experimental-nodejs-module` emit one JS entrypoint (no separate `_bg.js`).
+  - Ensure Node (CJS/ESM) and bundler entrypoints only expose public exports (no internal import shims).
+  - Add `/* @ts-self-types="./<name>.d.ts" */` to JS entrypoints for JSR/Deno resolution.
+  - Refresh reference test fixtures.
+  [#4879](https://github.com/wasm-bindgen/wasm-bindgen/pull/4879)
+
+* Forward worker errors to test output in the test runner.
+  [#4855](https://github.com/wasm-bindgen/wasm-bindgen/pull/4855)
+
+### Fixed
+
+* Fix: Include doc comments in TypeScript definitions for classes
+  [#4858](https://github.com/wasm-bindgen/wasm-bindgen/pull/4858)
+
+* Interpreter: support try_table blocks
+  [#4862](https://github.com/wasm-bindgen/wasm-bindgen/pull/4862)
+
+* Interpreter: Stop interpretting descriptor after `__wbindgen_describe_cast`
+  [#4862](https://github.com/wasm-bindgen/wasm-bindgen/pull/4898)
+
+## [0.2.106](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.105...0.2.106)
+
+### Added
+
+* New MSRV policy, and bump of the MSRV fo 1.71.
+  [#4801](https://github.com/wasm-bindgen/wasm-bindgen/pull4801)
+
+* Added `CSS Custom Highlight` API to `web-sys`.
+  [#4792](https://github.com/wasm-bindgen/wasm-bindgen/pull/4792)
+
+* Added typed `this` support in the first argument in free function exports via
+  a new `#[wasm_bindgen(this)]` attribute.
+  [#4757](https://github.com/wasm-bindgen/wasm-bindgen/pull/4757)
+
+* Added `reexport` attribute for imports to support re-exporting imported types,
+  with optional renaming.
+  [#4759](https://github.com/wasm-bindgen/wasm-bindgen/pull/4759)
+
+* Added `js_namespace` attribute on exported types, mirroring the import
+  semantics to enable arbitrarily nested exported interface objects.
+  [#4744](https://github.com/wasm-bindgen/wasm-bindgen/pull/4744)
+
+* Added 'container' attribute to `ScrollIntoViewOptions`
+  [#4806](https://github.com/wasm-bindgen/wasm-bindgen/pull/4806)
+
+* Updated and refactored output generation to use alphabetical ordering
+  of declarations.
+  [#4813](https://github.com/wasm-bindgen/wasm-bindgen/pull/4813)
+
+* Added benchmark support to `wasm-bindgen-test`.
+  [#4812](https://github.com/wasm-bindgen/wasm-bindgen/pull/4812)
+  [#4823](https://github.com/wasm-bindgen/wasm-bindgen/pull/4823)
+
+### Fixed
+
+* Fixed node test harness getting stuck after tests completed.
+  [#4776](https://github.com/wasm-bindgen/wasm-bindgen/pull/4776)
+
+* Quote names containing colons in generated .d.ts.
+  [#4488](https://github.com/wasm-bindgen/wasm-bindgen/pull/4488)
+
+* Fixes TryFromJsValue for structs JsValue stack corruption on failure.
+  [#4786](https://github.com/wasm-bindgen/wasm-bindgen/pull/4786)
+
+* Fixed `wasm-bindgen-test-runner` outputting empty line when using the `--list` option. In particular, `cargo-nextest` now works correctly.
+  [#4803](https://github.com/wasm-bindgen/wasm-bindgen/pull/4803)
+
+* It now works to build with `-Cpanic=unwind`.
+  [#4796](https://github.com/wasm-bindgen/wasm-bindgen/pull/4796)
+  [#4783](https://github.com/wasm-bindgen/wasm-bindgen/pull/4783)
+  [#4782](https://github.com/wasm-bindgen/wasm-bindgen/pull/4782)
+
+* Fixed duplicate symbols caused by enabling v0 mangling.
+  [#4822](https://github.com/wasm-bindgen/wasm-bindgen/pull/4822)
+
+* Fixed a multithreaded wasm32+atomics race where `Atomics.waitAsync` promise callbacks could call `run` without waking first, causing sporadic panics.
+  [#4821](https://github.com/wasm-bindgen/wasm-bindgen/pull/4821)
+
+### Removed
+
+## [0.2.105](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.104...0.2.105)
+
+### Added
+
+* Added `Math::PI` binding to `js_sys`, exposing the ECMAScript `Math.PI` constant.
+  [#4748](https://github.com/wasm-bindgen/wasm-bindgen/pull/4748)
+
+* Added ability to use `--keep-lld-exports` in `wasm-bindgen-test-runner` by setting the `WASM_BINDGEN_KEEP_LLD_EXPORTS` environment variable.
+  [#4736](https://github.com/wasm-bindgen/wasm-bindgen/pull/4736)
+
+* Added `CookieStore` API.
+  [#4706](https://github.com/wasm-bindgen/wasm-bindgen/pull/4706)
+
+* Added `run_cli_with_args` library functions to all `wasm_bindgen_cli` entrypoints.
+  [#4710](https://github.com/wasm-bindgen/wasm-bindgen/pull/4710)
+
+* Added `get_raw` and `set_raw` for `WebAssembly.Table`.
+  [#4701](https://github.com/wasm-bindgen/wasm-bindgen/pull/4701)
+
+* Added `new_with_value` and `grow_with_value` for `WebAssembly.Table`.
+  [#4698](https://github.com/wasm-bindgen/wasm-bindgen/pull/4698)
+
+* Added better support for async stack traces when building in debug mode.
+  [#4711](https://github.com/wasm-bindgen/wasm-bindgen/pull/4711)
+
+* Extended support for `TryFromJsValue` trait implementations.
+  [#4714](https://github.com/wasm-bindgen/wasm-bindgen/pull/4714)
+
+* New `JsValue.is_null_or_undefined()` method and intrinsic.
+  [#4751](https://github.com/wasm-bindgen/wasm-bindgen/pull/4751)
+
+* Support for `Option<JsValue>` in function arguments and return.
+  [#4752](https://github.com/wasm-bindgen/wasm-bindgen/pull/4752)
+
+* Support for `WASM_BINDGEN_KEEP_TEST_BUILD=1` environment variable
+  to retain build files when using the test runner.
+  [#4758](https://github.com/wasm-bindgen/wasm-bindgen/pull/4758)
+
+### Fixed
+
+* Fixed multithreading JS output for targets `bundler`, `deno` and `module`.
+  [#4685](https://github.com/wasm-bindgen/wasm-bindgen/pull/4685)
+
+* Fixed `TextDe/Encoder` detection for audio worklet use-cases.
+  [#4703](https://github.com/wasm-bindgen/wasm-bindgen/pull/4703)
+
+* Fixed post-processing failures in case Std has debug assertions enabled.
+  [#4705](https://github.com/wasm-bindgen/wasm-bindgen/pull/4705)
+
+* Fixed JS memory leak in `wasm_bindgen::Closure`.
+  [#4709](https://github.dev/wasm-bindgen/wasm-bindgen/pull/4709)
+
+* Fixed warning when using `#[wasm_bindgen(wasm_bindgen=xxx)]` on struct.
+  [#4715](https://github.dev/wasm-bindgen/wasm-bindgen/pull/4715)
+
+### Removed
+
+* Internal crate `wasm-bindgen-backend` will no longer be published.
+  [#4696](https://github.com/wasm-bindgen/wasm-bindgen/pull/4696)
+
+## [0.2.104](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.103...0.2.104)
+
+### Added
+
+* Added bindings for `WeakRef`.
+  [#4659](https://github.com/wasm-bindgen/wasm-bindgen/pull/4659)
+
+* Support `Symbol.dispose` methods by default, when it is supported in the environment.
+  [#4666](https://github.com/wasm-bindgen/wasm-bindgen/pull/4666)
+
+* Added `aarch64-unknown-linux-musl` release artifacts.
+  [#4668](https://github.com/wasm-bindgen/wasm-bindgen/pull/4668)
+
+### Changed
+
+* Unconditionally use the global `TextEncoder`/`TextDecoder` for string encoding/decoding. The Node.js output now requires a minimum of Node.js v11.
+  [#4670](https://github.com/wasm-bindgen/wasm-bindgen/pull/4670)
+
+* Deprecate the `msrv` crate feature. MSRV detection is now always on.
+  [#4675](https://github.com/wasm-bindgen/wasm-bindgen/pull/4675)
+
+### Fixed
+
+* Fixed wasm-bindgen-cli's `encode_into` argument not working.
+  [#4663](https://github.com/wasm-bindgen/wasm-bindgen/pull/4663)
+
+* Fixed a bug in `--experimental-reset-state-function` support for heap reset.
+  [#4665](https://github.com/wasm-bindgen/wasm-bindgen/pull/4665)
+
+* Fixed compilation failures on Rust v1.82 and v1.83.
+  [#4675](https://github.com/wasm-bindgen/wasm-bindgen/pull/4675)
+
+--------------------------------------------------------------------------------
+
+## [0.2.103](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.102...0.2.103)
+
+### Fixed
+
+* Fixed incorrect function mapping during post-processing.
+  [#4656](https://github.com/wasm-bindgen/wasm-bindgen/pull/4656)
+
+--------------------------------------------------------------------------------
+
+## [0.2.102](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.101...0.2.102)
+
+### Added
+
+* Added `DocumentOrShadowRoot.adoptedStyleSheets`.
+  [#4625](https://github.com/wasm-bindgen/wasm-bindgen/pull/4625)
+
+* Added support for arguments with spaces using shell-style quoting in webdriver `*_ARGS`
+  environment variables to `wasm-bindgen-test`.
+  [#4433](https://github.com/wasm-bindgen/wasm-bindgen/pull/4433)
+
+* Added ability to determine WebDriver JSON config location via
+  `WASM_BINDGEN_TEST_WEBDRIVER_JSON` environment variable to
+  `wasm-bindgen-test`.
+  [#4434](https://github.com/wasm-bindgen/wasm-bindgen/pull/4434)
+
+* Generate DWARF for tests by default. See the [guide on debug information] for more details.
+  [#4635](https://github.com/wasm-bindgen/wasm-bindgen/pull/4635)
+
+  [guide on debug information]: https://wasm-bindgen.github.io/wasm-bindgen/reference/debug-info.html
+
+* New `--target=module` target for outputting source phase imports.
+  [#4638](https://github.com/wasm-bindgen/wasm-bindgen/pull/4638)
+
+### Changed
+
+* Hidden deprecated options from the `wasm-bindgen --help` docs.
+  [#4646](https://github.com/wasm-bindgen/wasm-bindgen/pull/4646)
+
+### Fixed
+
+* Fixed wrong method names for `GestureEvent` bindings.
+  [#4615](https://github.com/wasm-bindgen/wasm-bindgen/pull/4615)
+
+* Fix crash caused by allocations during `TypedArray` interactions.
+  [#4622](https://github.com/wasm-bindgen/wasm-bindgen/pull/4622)
+
+--------------------------------------------------------------------------------
+
+## [0.2.101](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.100...0.2.101)
+
+### Added
+
+* Added format and colorSpace support to VideoFrameCopyToOptions
+  [#4543](https://github.com/wasm-bindgen/wasm-bindgen/pull/4543)
+
+* Added support for the [`onbeforeinput`](https://developer.mozilla.org/en-US/docs/Web/API/Element/beforeinput_event) attribute.
+  [#4544](https://github.com/wasm-bindgen/wasm-bindgen/pull/4544)
+
+* `TypedArray::new_from_slice(&[T])` constructor that allows to create a
+  JS-owned `TypedArray` from a Rust slice.
+  [#4555](https://github.com/wasm-bindgen/wasm-bindgen/pull/4555)
+
+* Added `Function::call4` and `Function::bind4` through `Function::call9` `Function::bind9` methods for calling  and binding JavaScript functions with 4-9 arguments.
+  [#4572](https://github.com/wasm-bindgen/wasm-bindgen/pull/4572)
+
+* Added isPointInFill and isPointInStroke methods for the SVGGeometryElement idl.
+  [#4509](https://github.com/wasm-bindgen/wasm-bindgen/pull/4509)
+
+* Added unstable bindings for `GestureEvent`.
+  [#4589](https://github.com/wasm-bindgen/wasm-bindgen/pull/4589)
+
+* Stricter checks for `module`, `raw_module` and `inline_js` attributes applied to inapplicable items.
+  [#4522](https://github.com/wasm-bindgen/wasm-bindgen/pull/4522)
+
+* Add bindings for `PictureInPicture`.
+  [#4593](https://github.com/rustwasm/wasm-bindgen/pull/4593)
+
+* Added `bytes` method for the `Blob` idl
+  [#4506](https://github.com/wasm-bindgen/wasm-bindgen/pull/4506)
+
+* Add error message when export symbol is not found
+  [#4594](https://github.com/wasm-bindgen/wasm-bindgen/pull/4594)
+
+### Changed
+
+* Deprecate async constructors.
+  [#4402](https://github.com/rustwasm/wasm-bindgen/pull/4402)
+
+* The `size` argument to `GPUCommandEncoder.copyBufferToBuffer` is now optional.
+  [#4508](https://github.com/wasm-bindgen/wasm-bindgen/pull/4508)
+
+* MSRV of CLI tools bumped to v1.82. This does not affect libraries like `wasm-bindgen`, `js-sys` and `web-sys`!
+  [#4608](https://github.com/wasm-bindgen/wasm-bindgen/pull/4608)
+
+### Fixed
+
+* Detect more failure scenarios when retrieving the Wasm module.
+  [#4556](https://github.com/wasm-bindgen/wasm-bindgen/pull/4556)
+
+* Add a workaround for `TextDecoder` failing in older version of Safari when too many bytes are decoded through it over its lifetime.
+  [#4472](https://github.com/wasm-bindgen/wasm-bindgen/pull/4472)
+
+* `TypedArray::from(&[T])` now works reliably across memory reallocations.
+  [#4555](https://github.com/wasm-bindgen/wasm-bindgen/pull/4555)
+
+* Fix incorrect memory loading and storing assertions during post-processing.
+  [#4554](https://github.com/wasm-bindgen/wasm-bindgen/pull/4554)
+
+* Fix test `--exact` option not working as expected.
+  [#4549](https://github.com/wasm-bindgen/wasm-bindgen/pull/4549)
+
+* Fix tables being removed even though they are used by stack closures.
+  [#4119](https://github.com/wasm-bindgen/wasm-bindgen/pull/4564)
+
+* Skip `__wasm_call_ctors` which we don't want to interpret.
+  [#4562](https://github.com/wasm-bindgen/wasm-bindgen/pull/4562)
+
+* Fix infinite recursion caused by the lack of proc-macro hygiene.
+  [#4601](https://github.com/wasm-bindgen/wasm-bindgen/pull/4601)
+
+* Fix running coverage with no_modules.
+  [#4604](https://github.com/wasm-bindgen/wasm-bindgen/pull/4604)
+
+* Fix proc-macro hygiene with `core`.
+  [#4606](https://github.com/wasm-bindgen/wasm-bindgen/pull/4606)
+
+### Removed
+
+* Crates intended purely for internal consumption by the wasm-bindgen CLI will no longer be published:
+  [#4608](https://github.com/wasm-bindgen/wasm-bindgen/pull/4608)
+
+  * `wasm-bindgen-externref-xform`
+  * `wasm-bindgen-multi-value-xform`
+  * `wasm-bindgen-threads-xform`
+  * `wasm-bindgen-wasm-conventions`
+  * `wasm-bindgen-wasm-interpreter`
+
+--------------------------------------------------------------------------------
+
+## [0.2.100](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.99...0.2.100)
+
+Released 2025-01-12
+
+### Added
+
+* Add attributes to overwrite return (``unchecked_return_type`) and parameter types (`unchecked_param_type`), descriptions (`return_description` and `param_description`) as well as parameter names (`js_name`) for exported functions and methods. See the guide for more details.
+  [#4394](https://github.com/rustwasm/wasm-bindgen/pull/4394)
+
+* Add a `copy_to_uninit()` method to all `TypedArray`s. It takes `&mut [MaybeUninit<T>]` and returns `&mut [T]`.
+  [#4340](https://github.com/rustwasm/wasm-bindgen/pull/4340)
+
+* Add test coverage support for Node.js.
+  [#4348](https://github.com/rustwasm/wasm-bindgen/pull/4348)
+
+* Support importing memory and using `wasm_bindgen::module()` in Node.js.
+  [#4349](https://github.com/rustwasm/wasm-bindgen/pull/4349)
+
+* Add `--list`, `--ignored`, `--exact` and `--nocapture` to `wasm-bindgen-test-runner`, analogous to `cargo test`.
+  [#4356](https://github.com/rustwasm/wasm-bindgen/pull/4356)
+
+* Add bindings to `Date.to_locale_time_string_with_options`.
+  [#4384](https://github.com/rustwasm/wasm-bindgen/pull/4384)
+
+* `#[wasm_bindgen]` now correctly applies `#[cfg(...)]`s in `struct`s.
+  [#4351](https://github.com/rustwasm/wasm-bindgen/pull/4351)
+
+### Changed
+
+* Optional parameters are now typed as `T | undefined | null` to reflect the actual JS behavior.
+  [#4188](https://github.com/rustwasm/wasm-bindgen/pull/4188)
+
+* Adding `getter`, `setter`, and `constructor` methods to enums now results in a compiler error. This was previously erroneously allowed and resulted in invalid JS code gen.
+  [#4278](https://github.com/rustwasm/wasm-bindgen/pull/4278)
+
+* Handle stuck and failed WebDriver processes when re-trying to start them.
+  [#4340](https://github.com/rustwasm/wasm-bindgen/pull/4340)
+
+* Align test output closer to native `cargo test`.
+  [#4358](https://github.com/rustwasm/wasm-bindgen/pull/4358)
+
+* Error if URL in `<WEBDRIVER>_REMOTE` can't be parsed instead of just ignoring it.
+  [#4362](https://github.com/rustwasm/wasm-bindgen/pull/4362)
+
+* Remove `WASM_BINDGEN_THREADS_MAX_MEMORY` and `WASM_BINDGEN_THREADS_STACK_SIZE`. The maximum memory size can be set via `-Clink-arg=--max-memory=<size>`. The stack size of a thread can be set when initializing the thread via the `default` function.
+  [#4363](https://github.com/rustwasm/wasm-bindgen/pull/4363)
+
+* `console.*()` calls in tests are now always intercepted by default. To show them use `--nocapture`. When shown they are always printed in-place instead of after test results, analogous to `cargo test`.
+  [#4356](https://github.com/rustwasm/wasm-bindgen/pull/4356)
+
+### Fixed
+
+- Fixed using [JavaScript keyword](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#keywords) as identifiers not being handled correctly.
+  [#4329](https://github.com/rustwasm/wasm-bindgen/pull/4329)
+
+  - Using JS keywords as `struct` and `enum` names will now error at compile time, instead of causing invalid JS code gen.
+  - Using JS keywords that are not valid to call or access properties on will now error at compile time, instead of causing invalid JS code gen if used as:
+    1. The first part of a `js_namespace` on imports.
+    2. The name of an imported type or constant if the type or constant does not have a `js_namespace` or `module` attribute.
+    3. The name of an imported function if the function is not a method and does not have a `js_namespace` or `module` attribute.
+  - Using JS keywords on imports in places other than the above will no longer cause the keywords to be escaped as `_{keyword}`.
+
+* Fixed passing large arrays into Rust failing because of internal memory allocations invalidating the memory buffer.
+  [#4353](https://github.com/rustwasm/wasm-bindgen/pull/4353)
+
+* Pass along an `ignore` attribute to `unsupported` tests.
+  [#4360](https://github.com/rustwasm/wasm-bindgen/pull/4360)
+
+* Use OS provided temporary directory for tests instead of Cargo's `target` directory.
+  [#4361](https://github.com/rustwasm/wasm-bindgen/pull/4361)
+
+* Error if URL in `<WEBDRIVER>_REMOTE` can't be parsed.
+  [#4362](https://github.com/rustwasm/wasm-bindgen/pull/4362)
+
+* Internal functions are now removed instead of invalidly imported if they are unused.
+  [#4366](https://github.com/rustwasm/wasm-bindgen/pull/4366)
+
+* Fixed `no_std` support for all APIs in `web-sys`.
+  [#4378](https://github.com/rustwasm/wasm-bindgen/pull/4378)
+
+* Prevent generating duplicate exports for closure conversions.
+  [#4380](https://github.com/rustwasm/wasm-bindgen/pull/4380)
+
+--------------------------------------------------------------------------------
+
+## [0.2.99](https://github.com/rustwasm/wasm-bindgen/compare/0.2.98...0.2.99)
+
+Released 2024-12-07
+
+### Fixed
+
+- Mark `wasm-bindgen` v0.2.98 only compatible with `wasm-bindgen-cli` of the same version.
+  [#4331](https://github.com/rustwasm/wasm-bindgen/pull/4331)
+
+--------------------------------------------------------------------------------
+
+## [0.2.98](https://github.com/rustwasm/wasm-bindgen/compare/0.2.97...0.2.98)
+
+Released 2024-12-07
+
+### Added
+
+* Add support for compiling with `atomics` for Node.js.
+  [#4318](https://github.com/rustwasm/wasm-bindgen/pull/4318)
+
+* Add `WASM_BINDGEN_TEST_DRIVER_TIMEOUT` environment variable to control the timeout to start and connect to the test driver.
+  [#4320](https://github.com/rustwasm/wasm-bindgen/pull/4320)
+
+* Add support for number slices of type `MaybeUninit<T>`.
+  [#4316](https://github.com/rustwasm/wasm-bindgen/pull/4316)
+
+### Changed
+
+* Remove `once_cell/critical-section` requirement for `no_std` with atomics.
+  [#4322](https://github.com/rustwasm/wasm-bindgen/pull/4322)
+
+* `static FOO: Option<T>` now returns `None` if undeclared in JS instead of throwing an error in JS.
+  [#4319](https://github.com/rustwasm/wasm-bindgen/pull/4319)
+
+### Fixed
+
+* Fix macro-hygiene for calls to `std::thread_local!`.
+  [#4315](https://github.com/rustwasm/wasm-bindgen/pull/4315)
+
+* Fix feature resolver version 1 compatibility.
+  [#4327](https://github.com/rustwasm/wasm-bindgen/pull/4327)
+
+--------------------------------------------------------------------------------
+
+## [0.2.97](https://github.com/rustwasm/wasm-bindgen/compare/0.2.96...0.2.97)
+
+Released 2024-11-30
+
+### Fixed
+
+* Fixed `js-sys` and `wasm-bindgen-futures` relying on internal paths of `wasm-bindgen` that are not crate feature additive.
+  [#4305](https://github.com/rustwasm/wasm-bindgen/pull/4305)
+
+--------------------------------------------------------------------------------
+
+## [0.2.96](https://github.com/rustwasm/wasm-bindgen/compare/0.2.95...0.2.96)
+
+Released 2024-11-29
+
+### Added
+
+* Added support for the [`HTMLOrSVGElement`](https://html.spec.whatwg.org/#htmlorsvgelement) `mixin`, which is used for all interfaces deriving from `Element`.
+  [#4143](https://github.com/rustwasm/wasm-bindgen/pull/4143)
+
+* Added bindings for [MathMLElement](https://www.w3.org/TR/MathML3).
+  [#4143](https://github.com/rustwasm/wasm-bindgen/pull/4143)
+
+* Added JSDoc type annotations to C-style enums.
+  [#4192](https://github.com/rustwasm/wasm-bindgen/pull/4192)
+
+* Added support for C-style enums with negative discriminants.
+  [#4204](https://github.com/rustwasm/wasm-bindgen/pull/4204)
+
+* Added bindings for `MediaStreamTrack.getCapabilities`.
+  [#4236](https://github.com/rustwasm/wasm-bindgen/pull/4236)
+
+* Added WASM ABI support for `u128` and `i128`
+  [#4222](https://github.com/rustwasm/wasm-bindgen/pull/4222)
+
+* Added support for the `wasm32v1-none` target.
+  [#4277](https://github.com/rustwasm/wasm-bindgen/pull/4277)
+
+* Added support for `no_std` to `js-sys`, `web-sys`, `wasm-bindgen-futures` and `wasm-bindgen-test`.
+  [#4277](https://github.com/rustwasm/wasm-bindgen/pull/4277)
+
+* Added support for `no_std` to `link_to!`, `static_string` (via `thread_local_v2`) and `throw`.
+  [#4277](https://github.com/rustwasm/wasm-bindgen/pull/4277)
+
+* Added environment variables to configure tests: `WASM_BINDGEN_USE_BROWSER`, `WASM_BINDGEN_USE_DEDICATED_WORKER`, `WASM_BINDGEN_USE_SHARED_WORKER` `WASM_BINDGEN_USE_SERVICE_WORKER`, `WASM_BINDGEN_USE_DENO` and `WASM_BINDGEN_USE_NODE_EXPERIMENTAL`. The use of `wasm_bindgen_test_configure!` will overwrite any environment variable.
+  [#4295](https://github.com/rustwasm/wasm-bindgen/pull/4295)
+
+### Changed
+
+* String enums now generate private TypeScript types but only if used.
+  [#4174](https://github.com/rustwasm/wasm-bindgen/pull/4174)
+
+* Remove unnecessary JSDoc type annotations from generated `.d.ts` files
+  [#4187](https://github.com/rustwasm/wasm-bindgen/pull/4187)
+
+* Deprecate `autofocus`, `tabIndex`, `focus()` and `blur()` bindings in favor of bindings on the inherited `Element` class.
+  [#4143](https://github.com/rustwasm/wasm-bindgen/pull/4143)
+
+* Optimized ABI performance for `Option<{i32,u32,isize,usize,f32,*const T,*mut T}>`.
+  [#4183](https://github.com/rustwasm/wasm-bindgen/pull/4183)
+
+* Deprecate `--reference-types` in favor of automatic target feature detection.
+  [#4237](https://github.com/rustwasm/wasm-bindgen/pull/4237)
+
+* `wasm-bindgen-test-runner` now tries to restart the WebDriver on failure, instead of spending its timeout period trying to connect to a non-existing WebDriver.
+  [#4267](https://github.com/rustwasm/wasm-bindgen/pull/4267)
+
+* Deprecated `#[wasm_bindgen(thread_local)]` in favor of `#[wasm_bindgen(thread_local_v2)]`, which creates a `wasm_bindgen::JsThreadLocal`. It is similar to `std::thread::LocalKey` but supports `no_std`.
+  [#4277](https://github.com/rustwasm/wasm-bindgen/pull/4277)
+
+* Updated the WebGPU API to the current draft as of 2024-11-22.
+  [#4290](https://github.com/rustwasm/wasm-bindgen/pull/4290)
+
+* Improved error messages for `self` arguments in invalid positions.
+  [#4276](https://github.com/rustwasm/wasm-bindgen/pull/4276)
+
+### Fixed
+
+* Fixed methods with `self: &Self` consuming the object.
+  [#4178](https://github.com/rustwasm/wasm-bindgen/pull/4178)
+
+* Fixed unused string enums generating JS values.
+  [#4193](https://github.com/rustwasm/wasm-bindgen/pull/4193)
+
+* Fixed triggering lints in testing facilities.
+  [#4195](https://github.com/rustwasm/wasm-bindgen/pull/4195)
+
+* Fixed `#[should_panic]` not working with `#[wasm_bindgen_test(unsupported = ...)]`.
+  [#4196](https://github.com/rustwasm/wasm-bindgen/pull/4196)
+
+* Fixed potential `null` error when using `JsValue::as_debug_string()`.
+  [#4192](https://github.com/rustwasm/wasm-bindgen/pull/4192)
+
+* Fixed generated types when the getter and setter of a property have different types.
+  [#4202](https://github.com/rustwasm/wasm-bindgen/pull/4202)
+
+* Fixed generated types when a static getter/setter has the same name as an instance getter/setter.
+  [#4202](https://github.com/rustwasm/wasm-bindgen/pull/4202)
+
+* Fixed invalid TypeScript return types for multivalue signatures.
+  [#4210](https://github.com/rustwasm/wasm-bindgen/pull/4210)
+
+* Only emit `table.fill` instructions if the bulk-memory proposal is enabled.
+  [#4237](https://github.com/rustwasm/wasm-bindgen/pull/4237)
+
+* Fixed calls to `JsCast::instanceof()` not respecting JavaScript namespaces.
+  [#4241](https://github.com/rustwasm/wasm-bindgen/pull/4241)
+
+* Fixed imports for functions using `this` and late binding.
+  [#4225](https://github.com/rustwasm/wasm-bindgen/pull/4225)
+
+* Don't expose non-functioning implicit constructors to classes when none are provided.
+  [#4282](https://github.com/rustwasm/wasm-bindgen/pull/4282)
+
+--------------------------------------------------------------------------------
+
+## [0.2.95](https://github.com/rustwasm/wasm-bindgen/compare/0.2.94...0.2.95)
+
+Released 2024-10-10
+
+### Added
+
+* Added support for implicit discriminants in enums.
+  [#4152](https://github.com/rustwasm/wasm-bindgen/pull/4152)
+
+* Added support for `Self` in complex type expressions in methods.
+  [#4155](https://github.com/rustwasm/wasm-bindgen/pull/4155)
+
+### Changed
+
+* String enums are no longer generate TypeScript types.
+  [#4174](https://github.com/rustwasm/wasm-bindgen/pull/4174)
+
+### Fixed
+
+* Fixed generated setters from WebIDL interface attributes binding to wrong JS method names.
+  [#4170](https://github.com/rustwasm/wasm-bindgen/pull/4170)
+
+* Fix string enums showing up in JS documentation and TypeScript bindings without corresponding types.
+  [#4175](https://github.com/rustwasm/wasm-bindgen/pull/4175)
+
+--------------------------------------------------------------------------------
+
+## [0.2.94](https://github.com/rustwasm/wasm-bindgen/compare/0.2.93...0.2.94) (YANKED)
+
+Released 2024-10-09
+
+### Added
+
+* Added support for the WebAssembly `Tail Call` proposal.
+  [#4111](https://github.com/rustwasm/wasm-bindgen/pull/4111)
+
+* Add bindings for `RTCPeerConnection.setConfiguration(RTCConfiguration)` method.
+  [#4105](https://github.com/rustwasm/wasm-bindgen/pull/4105)
+
+* Add bindings to `RTCRtpTransceiverDirection.stopped`.
+  [#4102](https://github.com/rustwasm/wasm-bindgen/pull/4102)
+
+* Added experimental support for `Symbol.dispose` via `WASM_BINDGEN_EXPERIMENTAL_SYMBOL_DISPOSE`.
+  [#4118](https://github.com/rustwasm/wasm-bindgen/pull/4118)
+
+* Added bindings for the draft [WebRTC Encoded Transform](https://www.w3.org/TR/webrtc-encoded-transform) spec.
+  [#4125](https://github.com/rustwasm/wasm-bindgen/pull/4125)
+
+* Added `Debug` implementation to `JsError`.
+  [#4136](https://github.com/rustwasm/wasm-bindgen/pull/4136)
+
+* Added support for `js_name` and `skip_typescript` attributes for string enums.
+  [#4147](https://github.com/rustwasm/wasm-bindgen/pull/4147)
+
+* Added `unsupported` crate to `wasm_bindgen_test(unsupported = test)` as a way of running tests on non-Wasm targets as well.
+  [#4150](https://github.com/rustwasm/wasm-bindgen/pull/4150)
+
+* Added additional bindings for methods taking buffer view types (e.g. `&[u8]`) with corresponding JS types (e.g. `Uint8Array`).
+  [#4156](https://github.com/rustwasm/wasm-bindgen/pull/4156)
+
+* Added additional bindings for setters from WebIDL interface attributes with applicaple parameter types of just `JsValue`.
+  [#4156](https://github.com/rustwasm/wasm-bindgen/pull/4156)
+
+### Changed
+
+* Implicitly enable reference type and multivalue transformations if the module already makes use of the corresponding target features.
+  [#4133](https://github.com/rustwasm/wasm-bindgen/pull/4133)
+
+* Updated Gamepad API.
+  [#4134](https://github.com/rustwasm/wasm-bindgen/pull/4134)
+
+* Deprecated `Gamepad::display_id` and `GamepadHapticActuator::type_`.
+  [#4134](https://github.com/rustwasm/wasm-bindgen/pull/4134)
+
+* Removed `GamepadAxisMoveEvent`, `GamepadAxisMoveEventInit`, `GamepadButtonEvent`, `GamepadButtonEventInit` and `GamepadServiceTest`, which were seemingly never implemented by any JS environment.
+  [#4134](https://github.com/rustwasm/wasm-bindgen/pull/4134)
+
+* Changed `TextDecoder.decode()` `input` parameter type from `&mut [u8]` to `&[u8]`.
+  [#4141](https://github.com/rustwasm/wasm-bindgen/pull/4141)
+
+* Updated the WebGPU API to the current draft as of 2024-10-07.
+  [#4145](https://github.com/rustwasm/wasm-bindgen/pull/4145)
+
+* Deprecated generated setters from WebIDL interface attribute taking `JsValue` in favor of newer bindings with specific parameter types.
+  [#4156](https://github.com/rustwasm/wasm-bindgen/pull/4156)
+
+### Fixed
+
+* Fixed linked modules emitting snippet files when not using `--split-linked-modules`.
+  [#4066](https://github.com/rustwasm/wasm-bindgen/pull/4066)
+
+* Fixed incorrect deprecation warning when passing no parameter into `default()` (`init()`) or `initSync()`.
+  [#4074](https://github.com/rustwasm/wasm-bindgen/pull/4074)
+
+* Fixed many proc-macro generated `impl` blocks missing `#[automatically_derived]`, affecting test coverage.
+  [#4078](https://github.com/rustwasm/wasm-bindgen/pull/4078)
+
+* Fixed negative `BigInt` values being incorrectly formatted with two minus signs.
+  [#4082](https://github.com/rustwasm/wasm-bindgen/pull/4082)
+  [#4088](https://github.com/rustwasm/wasm-bindgen/pull/4088)
+
+* Fixed emitted `package.json` structure to correctly specify its dependencies
+  [#4091](https://github.com/rustwasm/wasm-bindgen/pull/4091)
+
+* Fixed returning `Option<Enum>` now correctly has the `| undefined` type in TS bindings.
+  [#4137](https://github.com/rustwasm/wasm-bindgen/pull/4137)
+
+* Fixed enum variant name collisions with object prototype fields.
+  [#4137](https://github.com/rustwasm/wasm-bindgen/pull/4137)
+
+* Fixed multiline doc comment alignment and remove empty ones entirely.
+  [#4135](https://github.com/rustwasm/wasm-bindgen/pull/4135)
+
+* Fixed `experimental-nodejs-module` target when used with `#[wasm_bindgen(start)]`.
+  [#4093](https://github.com/rustwasm/wasm-bindgen/pull/4093)
+
+* Fixed error when importing very large JS files.
+  [#4146](https://github.com/rustwasm/wasm-bindgen/pull/4146)
+
+* Specify `"type": "module"` when deploying to nodejs-module
+  [#4092](https://github.com/rustwasm/wasm-bindgen/pull/4092)
+
+* Fixed string enums not generating TypeScript types.
+  [#4147](https://github.com/rustwasm/wasm-bindgen/pull/4147)
+
+* Bindings that take buffer view types (e.g. `&[u8]`) as parameters will now correctly return a `Result` when they might not support a backing `SharedArrayBuffer`. This only applies to new and unstable APIs, which won't cause a breaking in the API.
+  [#4156](https://github.com/rustwasm/wasm-bindgen/pull/4156)
+
+--------------------------------------------------------------------------------
+
+## [0.2.93](https://github.com/rustwasm/wasm-bindgen/compare/0.2.92...0.2.93)
+
+Released 2024-08-13
+
+### Added
+
+* Allow exporting functions named `default`. Throw error in wasm-bindgen-cli if --target web and
+  an exported symbol is named `default`.
+  [#3930](https://github.com/rustwasm/wasm-bindgen/pull/3930)
+
+* Added support for arbitrary expressions when using `#[wasm_bindgen(typescript_custom_section)]`.
+  [#3901](https://github.com/rustwasm/wasm-bindgen/pull/3901)
+
 * Implement `From<NonNull<T>>` for `JsValue`.
   [#3877](https://github.com/rustwasm/wasm-bindgen/pull/3877)
 
@@ -14,10 +959,128 @@
 * Added support for returning `Vec`s from async functions.
   [#3630](https://github.com/rustwasm/wasm-bindgen/pull/3630)
 
+* Added bindings for `InputDeviceInfo` and `MediaTrackCapabilities`.
+  [#3935](https://github.com/rustwasm/wasm-bindgen/pull/3935)
+
+* Add bindings for `RTCRtpReceiver.getCapabilities(DOMString)` method.
+  [#3941](https://github.com/rustwasm/wasm-bindgen/pull/3941)
+
+* Add bindings for `VisualViewport`.
+  [#3931](https://github.com/rustwasm/wasm-bindgen/pull/3931)
+
+* Add bindings for `queueMicrotask`.
+  [#3981](https://github.com/rustwasm/wasm-bindgen/pull/3981)
+
+* Add experimental bindings for User Agent Client Hints API
+  [#3989](https://github.com/rustwasm/wasm-bindgen/pull/3989)
+
+* Add bindings for `FocusOptions`.
+  [#3996](https://github.com/rustwasm/wasm-bindgen/pull/3996)
+
+* Add bindings for `RTCRtpReceiver.jitterBufferTarget`.
+  [#3968](https://github.com/rustwasm/wasm-bindgen/pull/3968)
+
+* Generate getters for all WebIDL dictionary types.
+  [#3993](https://github.com/rustwasm/wasm-bindgen/pull/3993)
+
+* Support for iterable in WebIDL. Gives `entries`, `keys`, `values` methods for regular and asynchronous, as well as `for_each` for regular, iterables.
+  [#3962](https://github.com/rustwasm/wasm-bindgen/pull/3962)
+
+* Add bindings for `HTMLTableCellElement.abbr` and `scope` properties.
+  [#3972](https://github.com/rustwasm/wasm-bindgen/pull/3972)
+
+* Add WebIDL definitions relating to `Popover API`.
+  [#3977](https://github.com/rustwasm/wasm-bindgen/pull/3977)
+
+* Added the `thread_stack_size` property to the object parameter of `default()` (`init()`) and `initSync()`, making it possible to set the stack size of spawned threads. `__wbindgen_thread_destroy()` now has a third optional parameter for the stack size, the default stack size is assumed when not passing it. When calling from the thread to be destroyed, by passing no parameters, the correct stack size is determined internally.
+  [#3995](https://github.com/rustwasm/wasm-bindgen/pull/3995)
+
+* Added bindings to the Device Memory API.
+  [#4011](https://github.com/rustwasm/wasm-bindgen/pull/4011)
+
+* Added support for WebIDL records. This added new methods to various APIs, notably `ClipboardItem()`, `GPUDeviceDescriptor.requiredLimits` and `Header()`.
+  [#4030](https://github.com/rustwasm/wasm-bindgen/pull/4030)
+
+* Added an official MSRV policy. Library MSRV changes will be accompanied by a minor version bump. CLI tool MSRV can change with any version bump.
+  [#4038](https://github.com/rustwasm/wasm-bindgen/pull/4038)
+
+* Added bindings to `NavigatorOptions.vibrate`.
+  [#4041](https://github.com/rustwasm/wasm-bindgen/pull/4041)
+
+* Added an experimental Node.JS ES module target, in comparison the current `node` target uses CommonJS, with `--target experimental-nodejs-module` or when testing with `wasm_bindgen_test_configure!(run_in_node_experimental)`.
+  [#4027](https://github.com/rustwasm/wasm-bindgen/pull/4027)
+
+* Added importing strings as `JsString` through `#[wasm_bindgen(thread_local, static_string)] static STRING: JsString = "a string literal";`.
+  [#4055](https://github.com/rustwasm/wasm-bindgen/pull/4055)
+
+* Added experimental test coverage support for `wasm-bindgen-test-runner`, see the guide for more information.
+  [#4060](https://github.com/rustwasm/wasm-bindgen/pull/4060)
+
 ### Changed
 
 * Stabilize Web Share API.
   [#3882](https://github.com/rustwasm/wasm-bindgen/pull/3882)
+
+* Generate JS bindings for WebIDL dictionary setters instead of using `Reflect`. This increases the size of the Web API bindings but should be more performant. Also, importing getters/setters from JS now supports specifying the JS attribute name as a string, e.g. `#[wasm_bindgen(method, setter = "x-cdm-codecs")]`.
+  [#3898](https://github.com/rustwasm/wasm-bindgen/pull/3898)
+
+* Greatly improve the performance of sending WebIDL 'string enums' across the JavaScript boundary by converting the enum variant string to/from an int.
+  [#3915](https://github.com/rustwasm/wasm-bindgen/pull/3915)
+
+* Use `table.fill` when appropriate.
+  [#3446](https://github.com/rustwasm/wasm-bindgen/pull/3446)
+
+* Annotated methods in WebCodecs that throw.
+  [#3970](https://github.com/rustwasm/wasm-bindgen/pull/3970)
+
+* Update and stabilize the Clipboard API.
+  [#3992](https://github.com/rustwasm/wasm-bindgen/pull/3992)
+
+* Deprecate builder-pattern type setters for WebIDL dictionary types and introduce non-mutable setters instead.
+  [#3993](https://github.com/rustwasm/wasm-bindgen/pull/3993)
+
+* Allow imported async functions to return any type that can be converted from a `JsValue`.
+  [#3919](https://github.com/rustwasm/wasm-bindgen/pull/3919)
+
+* Update Web Authentication API to level 3.
+  [#4000](https://github.com/rustwasm/wasm-bindgen/pull/4000)
+
+* Deprecate `AudioBufferSourceNode.onended` and `AudioBufferSourceNode.stop()`.
+  [#4020](https://github.com/rustwasm/wasm-bindgen/pull/4020)
+
+* Increase default stack size for spawned threads from 1 to 2 MB.
+  [#3995](https://github.com/rustwasm/wasm-bindgen/pull/3995)
+
+* Deprecated parameters to `default` (`init`) and `initSync` in favor of an object.
+  [#3995](https://github.com/rustwasm/wasm-bindgen/pull/3995)
+
+* Update `AbortSignal` and `AbortController` according to the WHATWG specification.
+  [#4026](https://github.com/rustwasm/wasm-bindgen/pull/4026)
+
+* Update the Indexed DB API.
+  [#4027](https://github.com/rustwasm/wasm-bindgen/pull/4027)
+
+* `UnwrapThrowExt for Result` now makes use of the required `Debug` bound to display the error as well.
+  [#4035](https://github.com/rustwasm/wasm-bindgen/pull/4035)
+  [#4049](https://github.com/rustwasm/wasm-bindgen/pull/4049)
+
+* MSRV of CLI tools bumped to v1.76. This does not affect libraries like `wasm-bindgen`, `js-sys` and `web-sys`!
+  [#4037](https://github.com/rustwasm/wasm-bindgen/pull/4037)
+
+* Filtered files in published crates, significantly reducing the package size and notably excluding any bash files.
+  [#4046](https://github.com/rustwasm/wasm-bindgen/pull/4046)
+
+* Deprecated `JsStatic` in favor of `#[wasm_bindgen(thread_local)]`, which creates a `std::thread::LocalKey`. The syntax is otherwise the same.
+  [#4057](https://github.com/rustwasm/wasm-bindgen/pull/4057)
+
+* Removed `impl Deref for JsStatic` when compiling with `cfg(target_feature = "atomics")`, which was unsound.
+  [#4057](https://github.com/rustwasm/wasm-bindgen/pull/4057)
+
+* Updated the WebGPU WebIDL to the current draft as of 2024-08-05.
+  [#4062](https://github.com/rustwasm/wasm-bindgen/pull/4062)
+
+* Use object URLs for linked modules without `--split-linked-modules`.
+  [#4067](https://github.com/rustwasm/wasm-bindgen/pull/4067)
 
 ### Fixed
 
@@ -26,6 +1089,51 @@
 
 * Fix `catch` not being thread-safe.
   [#3879](https://github.com/rustwasm/wasm-bindgen/pull/3879)
+
+* Fix MSRV compilation.
+  [#3927](https://github.com/rustwasm/wasm-bindgen/pull/3927)
+
+* Fix `clippy::empty_docs` lint.
+  [#3946](https://github.com/rustwasm/wasm-bindgen/pull/3946)
+
+* Fix missing target features in module when enabling reference types or multi-value transformation.
+  [#3967](https://github.com/rustwasm/wasm-bindgen/pull/3967)
+
+* Fixed Rust values getting GC'd while still borrowed.
+  [#3940](https://github.com/rustwasm/wasm-bindgen/pull/3940)
+
+* Fixed Rust values not getting GC'd if they were created via. a constructor.
+  [#3940](https://github.com/rustwasm/wasm-bindgen/pull/3940)
+
+* Fix triggering `clippy::mem_forget` lint in exported structs.
+  [#3985](https://github.com/rustwasm/wasm-bindgen/pull/3985)
+
+* Fix MDN links to static interface methods.
+  [#4010](https://github.com/rustwasm/wasm-bindgen/pull/4010)
+
+* Fixed Deno support.
+  [#3990](https://github.com/rustwasm/wasm-bindgen/pull/3990)
+
+* Fix `__wbindgen_thread_destroy()` ignoring parameters.
+  [#3995](https://github.com/rustwasm/wasm-bindgen/pull/3995)
+
+* Fix `no_std` support and therefor compiling with `default-features = false`.
+  [#4005](https://github.com/rustwasm/wasm-bindgen/pull/4005)
+
+* Fix byte order for big-endian platforms.
+  [#4015](https://github.com/rustwasm/wasm-bindgen/pull/4015)
+
+* Allow ex/importing structs, functions and parameters named with raw identifiers.
+  [#4025](https://github.com/rustwasm/wasm-bindgen/pull/4025)
+
+* Implement a more reliable way to detect the stack pointer.
+  [#4036](https://github.com/rustwasm/wasm-bindgen/pull/4036)
+
+* `#[track_caller]` is now always applied on `UnwrapThrowExt` methods when not targeting `wasm32-unknown-unknown`.
+  [#4042](https://github.com/rustwasm/wasm-bindgen/pull/4042)
+
+* Fixed linked modules emitting snippet files when not using `--split-linked-modules`.
+  [#4066](https://github.com/rustwasm/wasm-bindgen/pull/4066)
 
 --------------------------------------------------------------------------------
 
@@ -99,7 +1207,7 @@ Released 2024-02-06
 * Updated the WebGPU WebIDL to the current draft as of 2024-01-30. Note that this retains the previous update's workaround for `GPUPipelineError`, and holds back an update to the `buffer` argument of the `GPUQueue.{writeBuffer,writeTexture}` methods.
   [#3816](https://github.com/rustwasm/wasm-bindgen/pull/3816)
 
-* Depreate `--weak-refs` and `WASM_BINDGEN_WEAKREF` in favor of automatic run-time detection.
+* Deprecate `--weak-refs` and `WASM_BINDGEN_WEAKREF` in favor of automatic run-time detection.
   [#3822](https://github.com/rustwasm/wasm-bindgen/pull/3822)
 
 ### Fixed
@@ -113,7 +1221,7 @@ Released 2024-02-06
 * Fixed using `#[wasm_bindgen(js_name = default)]` with `#[wasm_bindgen(module = ...)]`.
   [#3823](https://github.com/rustwasm/wasm-bindgen/pull/3823)
 
-* Fixed nighly build of `wasm-bindgen-futures`.
+* Fixed nightly build of `wasm-bindgen-futures`.
   [#3827](https://github.com/rustwasm/wasm-bindgen/pull/3827)
 
 --------------------------------------------------------------------------------
@@ -192,7 +1300,7 @@ Released 2023-11-27.
 
 --------------------------------------------------------------------------------
 
-## [0.2.88](https://github.com/rustwasm/wasm-bindgen/compare/0.2.87...0.2.88)
+## [0.2.88](https://github.com/rustwasm/wasm-bindgen/compare/0.2.87...0.2.88) (YANKED)
 
 Released 2023-11-01
 
@@ -278,7 +1386,7 @@ Released 2023-11-01
   [#3537](https://github.com/rustwasm/wasm-bindgen/pull/3537)
 
 * Changed behavior when compiling to `wasm32-wasi` to match `wasm32-emscripten` and
-  non-WASM targets, generating a stub that panics when called rather than a wasm-
+  non-Wasm targets, generating a stub that panics when called rather than a wasm-
   bindgen placeholder.
   [#3233](https://github.com/rustwasm/wasm-bindgen/pull/3233)
 
@@ -746,7 +1854,7 @@ Released 2020-04-29.
   [#2099](https://github.com/rustwasm/wasm-bindgen/pull/2099)
 
 * The output of `wasm-bindgen` is now compatible with Webpack 5 and the updated
-  version of the wasm ESM integration specification.
+  version of the Wasm ESM integration specification.
   [#2110](https://github.com/rustwasm/wasm-bindgen/pull/2099)
 
 --------------------------------------------------------------------------------
@@ -929,7 +2037,7 @@ Released 2019-11-19.
 * Running `wasm-bindgen` over empty anyref modules now works again.
   [#1861](https://github.com/rustwasm/wasm-bindgen/pull/1861)
 
-* Support for multi-value JS engines has been fixed as a wasm interface types
+* Support for multi-value JS engines has been fixed as a Wasm interface types
   polyfill.
   [#1863](https://github.com/rustwasm/wasm-bindgen/pull/1863)
 
@@ -1152,8 +2260,8 @@ Released 2019-07-11.
   slices.
   [#1639](https://github.com/rustwasm/wasm-bindgen/pull/1639)
 
-* When using the `bundler` target the import of the wasm file now uses the
-  `.wasm` extension to ensure a wasm file is loaded.
+* When using the `bundler` target the import of the Wasm file now uses the
+  `.wasm` extension to ensure a Wasm file is loaded.
   [#1646](https://github.com/rustwasm/wasm-bindgen/pull/1646)
 
 * The old internal `Stack` trait has been removed since it is no longer used.
@@ -1281,7 +2389,7 @@ Released 2019-05-16.
 * A utility for counting the size of the `anyref` heap has been added.
   [#1521](https://github.com/rustwasm/wasm-bindgen/pull/1521)
 
-* Passing ASCII-only strings to WASM should now be significantly faster.
+* Passing ASCII-only strings to Wasm should now be significantly faster.
   [#1470](https://github.com/rustwasm/wasm-bindgen/pull/1470)
 
 * The `selectionStart` and `selectionEnd` APIs of text areas have been enabled.
@@ -1421,7 +2529,7 @@ Released 2019-04-10.
   [#1416](https://github.com/rustwasm/wasm-bindgen/pull/1416)
 
 * A `wasm_bindgen::function_table()` function has been added to expose the
-  `WebAssembly.Table` and get access to it in wasm code.
+  `WebAssembly.Table` and get access to it in Wasm code.
   [#1431](https://github.com/rustwasm/wasm-bindgen/pull/1431)
 
 ### Fixed
@@ -1584,7 +2692,7 @@ Released 2019-02-15.
   [#1225](https://github.com/rustwasm/wasm-bindgen/pull/1225).
 
 * A `--remove-producers-section` flag has been added to the CLI tool to, well,
-  remove the `producers` section from the final wasm file.
+  remove the `producers` section from the final Wasm file.
   [#1256](https://github.com/rustwasm/wasm-bindgen/pull/1256).
 
 ### Fixed
@@ -1622,7 +2730,7 @@ Released 2019-02-12.
 ### Changed
 
 * `wasm-bindgen` now internally uses the `walrus` crate to perform its
-  transformations of the wasm that rustc/LLVM emits. See
+  transformations of the Wasm that rustc/LLVM emits. See
   [#1237](https://github.com/rustwasm/wasm-bindgen/pull/1237).
 
 ### Fixed
@@ -1774,17 +2882,17 @@ Released 2018-12-04.
 ### Added
 
 * Add a `#[wasm_bindgen(start)]` attribute to customize the `start` section of
-  the wasm module.
+  the Wasm module.
   [#1057](https://github.com/rustwasm/wasm-bindgen/pull/1057)
 
-* Add support for producing the new "producers" section of wasm binaries
+* Add support for producing the new "producers" section of Wasm binaries
   [#1041](https://github.com/rustwasm/wasm-bindgen/pull/1041)
 
 * Add support a `typescript_custom_section` attribute for producing custom
   typescript abstractions
   [#1048](https://github.com/rustwasm/wasm-bindgen/pull/1048)
 
-* Generate `*.d.ts` files for wasm files in addition to the JS bindings
+* Generate `*.d.ts` files for Wasm files in addition to the JS bindings
   [#1053](https://github.com/rustwasm/wasm-bindgen/pull/1053)
 
 * Add a feature to assert that all attributes in `#[wasm_bindgen]` are used to
@@ -1833,7 +2941,7 @@ Released 2018-11-12.
   added since `structural` is now the default
   [#1019](https://github.com/rustwasm/wasm-bindgen/pull/1019)
 
-[final-dox]: https://rustwasm.github.io/wasm-bindgen/reference/attributes/on-js-imports/final.html
+[final-dox]: https://wasm-bindgen.github.io/wasm-bindgen/reference/attributes/on-js-imports/final.html
 
 * A new CLI flag, `--remove-name-section`, can be passed to remove the wasm
   `name` section which contains the names of functions for debugging (typically
@@ -2061,7 +3169,7 @@ Released 2018-09-07
 
 ### Fixed
 
-* The "names" section of the wasm binary is now correctly preserved by
+* The "names" section of the Wasm binary is now correctly preserved by
   wasm-bindgen.
 
 --------------------------------------------------------------------------------
@@ -2186,7 +3294,7 @@ Released 2018-08-13.
   renamed imported JS classes now properly works with constructors.
 
 [rfc-2]: https://rustwasm.github.io/rfcs/002-wasm-bindgen-inheritance-casting.html
-[extends-attr]: https://rustwasm.github.io/wasm-bindgen/reference/attributes/on-js-imports/extends.html
+[extends-attr]: https://wasm-bindgen.github.io/wasm-bindgen/reference/attributes/on-js-imports/extends.html
 [#662]: https://github.com/rustwasm/wasm-bindgen/pull/662
 
 --------------------------------------------------------------------------------
@@ -2254,7 +3362,7 @@ expose all APIs browsers have. More info on this soon!
 * A `--keep-debug` flag has been added to the CLI to retain debug sections by
   default. This happens by default when `--debug` is passed.
 
-[book]: https://rustwasm.github.io/wasm-bindgen/
+[book]: https://wasm-bindgen.github.io/wasm-bindgen/
 
 ### Fixed
 
