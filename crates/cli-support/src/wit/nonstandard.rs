@@ -70,6 +70,11 @@ pub struct WasmBindgenAux {
     /// When this is `Some`, all imports with `catch` use Wasm catch wrappers
     /// instead of JS `handleError` wrappers.
     pub js_tag: Option<walrus::TagId>,
+
+    /// The imported wrapped JSTag for abort-reinit mode.
+    /// This is a custom WebAssembly.Tag used to wrap exceptions so they can be
+    /// distinguished from other JS exceptions.
+    pub wrapped_js_tag: Option<walrus::TagId>,
 }
 
 pub type WasmBindgenAuxId = TypedCustomSectionId<WasmBindgenAux>;
@@ -109,6 +114,8 @@ pub struct AuxFunctionArgumentData {
     pub name: String,
     /// Specifies the function argument type override
     pub ty_override: Option<String>,
+    /// Specifies whether the parameter is optional
+    pub optional: bool,
     /// Specifies the argument description
     pub desc: Option<String>,
 }
@@ -226,8 +233,12 @@ pub struct AuxStringEnum {
 
 #[derive(Debug)]
 pub struct AuxStruct {
-    /// The name of this struct
+    /// The JS name of this struct (used for JS output)
     pub name: String,
+    /// The Rust name of this struct (used as internal key, matches js_class on exports)
+    pub rust_name: String,
+    /// The namespace-qualified name (used for wasm symbol generation)
+    pub qualified_name: String,
     /// The copied Rust comments to forward to JS
     pub comments: String,
     /// Whether to generate helper methods for inspecting the class

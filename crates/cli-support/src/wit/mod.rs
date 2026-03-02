@@ -220,18 +220,7 @@ impl<'a> Context<'a> {
             Descriptor::Unit,
             AuxImport::Intrinsic(Intrinsic::ObjectDropRef),
         )?;
-        self.add_aux_import_to_import_map(
-            "__wbindgen_object_is_null_or_undefined",
-            vec![Descriptor::Ref(Box::new(Descriptor::Externref))],
-            Descriptor::Boolean,
-            AuxImport::Intrinsic(Intrinsic::ObjectIsNullOrUndefined),
-        )?;
-        self.add_aux_import_to_import_map(
-            "__wbindgen_object_is_undefined",
-            vec![Descriptor::Ref(Box::new(Descriptor::Externref))],
-            Descriptor::Boolean,
-            AuxImport::Intrinsic(Intrinsic::ObjectIsUndefined),
-        )?;
+
         for import in imports_to_delete {
             self.module.imports.delete(import);
         }
@@ -580,7 +569,7 @@ impl<'a> Context<'a> {
             None => {
                 let base_name = export.function.name.to_string();
                 if let Some(ref ns) = export.js_namespace {
-                    format!("{}_{base_name}", ns.join("_"))
+                    format!("{}__{base_name}", ns.join("__"))
                 } else {
                     base_name
                 }
@@ -658,6 +647,7 @@ impl<'a> Context<'a> {
                 .map(|v| AuxFunctionArgumentData {
                     name: v.name,
                     ty_override: v.ty_override.map(String::from),
+                    optional: v.optional,
                     desc: v.desc.map(String::from),
                 })
                 .collect::<Vec<_>>(),
@@ -1103,6 +1093,8 @@ impl<'a> Context<'a> {
 
     fn enum_(&mut self, enum_: decode::Enum<'_>) -> Result<(), Error> {
         let signed = enum_.signed;
+        let qualified_name =
+            wasm_bindgen_shared::qualified_name(enum_.js_namespace.as_deref(), enum_.name);
         let aux = AuxEnum {
             name: enum_.name.to_string(),
             comments: concatenate_comments(&enum_.comments),
@@ -1128,7 +1120,7 @@ impl<'a> Context<'a> {
         let mut result = Ok(());
         self.aux
             .enums
-            .entry(aux.name.clone())
+            .entry(qualified_name)
             .and_modify(|existing| {
                 result = Err(anyhow!("duplicate enums:\n{existing:?}\n{aux:?}"));
             })
@@ -1137,9 +1129,12 @@ impl<'a> Context<'a> {
     }
 
     fn struct_(&mut self, struct_: decode::Struct<'_>) -> Result<(), Error> {
+        let qualified_name =
+            wasm_bindgen_shared::qualified_name(struct_.js_namespace.as_deref(), struct_.name);
+        let rust_name = struct_.rust_name;
         for field in struct_.fields {
-            let getter = wasm_bindgen_shared::struct_field_get(struct_.name, field.name);
-            let setter = wasm_bindgen_shared::struct_field_set(struct_.name, field.name);
+            let getter = wasm_bindgen_shared::struct_field_get(&qualified_name, field.name);
+            let setter = wasm_bindgen_shared::struct_field_set(&qualified_name, field.name);
             let descriptor = match self.descriptors.remove(&getter) {
                 None => continue,
                 Some(d) => d,
@@ -1162,7 +1157,7 @@ impl<'a> Context<'a> {
                     asyncness: false,
                     comments: concatenate_comments(&field.comments),
                     kind: AuxExportKind::Method {
-                        class: struct_.name.to_string(),
+                        class: rust_name.to_string(),
                         name: field.name.to_string(),
                         receiver: AuxReceiverKind::Borrowed,
                         kind: AuxExportedMethodKind::Getter,
@@ -1197,7 +1192,7 @@ impl<'a> Context<'a> {
                     asyncness: false,
                     comments: concatenate_comments(&field.comments),
                     kind: AuxExportKind::Method {
-                        class: struct_.name.to_string(),
+                        class: rust_name.to_string(),
                         name: field.name.to_string(),
                         receiver: AuxReceiverKind::Borrowed,
                         kind: AuxExportedMethodKind::Setter,
@@ -1213,6 +1208,8 @@ impl<'a> Context<'a> {
         }
         let aux = AuxStruct {
             name: struct_.name.to_string(),
+            rust_name: rust_name.to_string(),
+            qualified_name: qualified_name.clone(),
             comments: concatenate_comments(&struct_.comments),
             is_inspectable: struct_.is_inspectable,
             generate_typescript: struct_.generate_typescript,
@@ -1224,20 +1221,20 @@ impl<'a> Context<'a> {
         };
         self.aux.structs.push(aux);
 
-        let wrap_constructor = wasm_bindgen_shared::new_function(struct_.name);
+        let wrap_constructor = wasm_bindgen_shared::new_function(&qualified_name);
         self.add_aux_import_to_import_map(
             &wrap_constructor,
             vec![Descriptor::I32],
             Descriptor::Externref,
-            AuxImport::WrapInExportedClass(struct_.name.to_string()),
+            AuxImport::WrapInExportedClass(rust_name.to_string()),
         )?;
 
-        let unwrap_fn = wasm_bindgen_shared::unwrap_function(struct_.name);
+        let unwrap_fn = wasm_bindgen_shared::unwrap_function(&qualified_name);
         self.add_aux_import_to_import_map(
             &unwrap_fn,
             vec![Descriptor::Ref(Box::new(Descriptor::Externref))],
             Descriptor::I32,
-            AuxImport::UnwrapExportedClass(struct_.name.to_string()),
+            AuxImport::UnwrapExportedClass(rust_name.to_string()),
         )?;
 
         Ok(())

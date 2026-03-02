@@ -9,6 +9,91 @@
 
 ### Fixed
 
+### Removed
+
+## [0.2.114](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.113...0.2.114)
+
+### Added
+
+* Added `unchecked_optional_param_type` attribute for marking exported function parameters as
+  optional in TypeScript (`?:`) and JSDoc (`[paramName]`) output. Mutually exclusive with
+  `unchecked_param_type`. Required parameters after optional parameters are rejected at compile time.
+  [#5002](https://github.com/wasm-bindgen/wasm-bindgen/pull/5002)
+
+* Added termination detection for `panic=unwind` builds. When a non-JS exception (e.g. a Rust
+  panic) escapes from Wasm, the instance is marked as terminated and subsequent calls from JS
+  into Wasm will throw a `Module terminated` error instead of re-entering corrupted state.
+  [#5005](https://github.com/wasm-bindgen/wasm-bindgen/pull/5005)
+
+* When `--reset-state` is combined with `panic=unwind` builds, the Wasm instance is
+  automatically reset after a fatal termination, allowing subsequent calls to succeed
+  instead of throwing a `Module terminated` error.
+  [#5013](https://github.com/wasm-bindgen/wasm-bindgen/pull/5013)
+
+### Changed
+
+* Replaced runtime `0x80000000` vtable bit-flag for closure unwind safety with a
+  compile-time `const UNWIND_SAFE: bool` generic on the invoke shim, `OwnedClosure`,
+  and `BorrowedClosure`. Removes `OwnedClosureUnwind` and deduplicates internal
+  closure helpers. The public API is unchanged.
+  [#5003](https://github.com/wasm-bindgen/wasm-bindgen/pull/5003)
+
+* Removed unused `IntoWasmClosureRef*::WithLifetime` types,
+  `WasmClosure::to_wasm_slice`, and a lifetime from
+  `IntoWasmClosureRef*`; moved `Static` associated type into `WasmClosure`.
+  [#5003](https://github.com/wasm-bindgen/wasm-bindgen/pull/5003)
+
+### Fixed
+
+* Fixed exported structs/enums/functions with the same `js_name` but different
+  `js_namespace` values producing symbol collisions at compile time, by deriving
+  internal wasm symbols from a qualified name that includes the namespace.
+  [#4977](https://github.com/wasm-bindgen/wasm-bindgen/pull/4977)
+
+* Fixed soundness hole in `ScopedClosure`'s `UpcastFrom` that allowed to extend the lifetime after the original `ScopedClosure` was dropped.
+  [#5006](https://github.com/wasm-bindgen/wasm-bindgen/pull/5006)
+
+## [0.2.113](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.112...0.2.113)
+
+### Changed
+
+* Reduced usage of `unsafe` code: replaced `transmute`/`transmute_copy` with safe
+  alternatives for `Boolean`/`Null`/`Undefined` constants and `ArrayTuple` conversions,
+  unified duplicated `AsRef`/`From` impls for generic imported types, and removed the
+  `__wbindgen_object_is_undefined` intrinsic in favor of a safe Rust-side equivalent.
+  [#4993](https://github.com/wasm-bindgen/wasm-bindgen/pull/4993)
+
+* Renamed `__wbindgen_object_is_null_or_undefined` intrinsic to
+  `__wbindgen_is_null_or_undefined` and removed the `__wbindgen_object_is_undefined`
+  intrinsic, replacing it with a safe Rust-side check. The `is_null_or_undefined` check
+  now uses safe `&JsValue` ABI instead of raw `u32`.
+  [#4994](https://github.com/wasm-bindgen/wasm-bindgen/pull/4994)
+### Fixed
+
+* Fixed incorrect method naming for stable web-sys methods that reference unstable
+  types (e.g. `texImage2D` taking a `VideoFrame` parameter). These methods were
+  being named in a separate unstable expansion namespace, producing overly-short
+  names like `tex_image_2d` instead of the correct
+  `tex_image_2d_with_u32_and_u32_and_video_frame`. The fix separates the signature
+  classification to distinguish "from unstable IDL" (authoritative overrides) from
+  "stable method using an unstable type", ensuring the latter is named as part of
+  the stable expansion.
+  [#4991](https://github.com/wasm-bindgen/wasm-bindgen/pull/4991)
+
+## [0.2.112](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.111...0.2.112)
+
+### Removed
+
+* Removed `ImmediateClosure` type introduced in 0.2.109. Stack-borrowed `&dyn Fn` / `&mut dyn FnMut`
+  closures are now treated as unwind safe by default (panics are caught and converted to JS exceptions
+  with proper unwinding). A unified `ScopedClosure::immediate` approach may be revisited in a future
+  release.
+  [#4986](https://github.com/wasm-bindgen/wasm-bindgen/pull/4986)
+
+## [0.2.111](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.110...0.2.111)
+
+### Fixed
+
 * Restored backwards compatibility for breaking changes introduced in 0.2.110:
   re-added deprecated `Promise::then2` binding, reverted `Promise::all_settled`
   stable signature to take `&JsValue` instead of owned `Object`, and added
@@ -16,11 +101,7 @@
   `Iter` structs.
   [#4979](https://github.com/wasm-bindgen/wasm-bindgen/pull/4979)
 
-### Removed
-
-## [0.2.109](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.108...0.2.109)
-
-### Added
+## [0.2.110](https://github.com/wasm-bindgen/wasm-bindgen/compare/0.2.109...0.2.110)
 
 ### Changed
 

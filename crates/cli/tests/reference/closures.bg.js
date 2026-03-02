@@ -11,17 +11,17 @@ export function delayed_callback() {
 export function use_stack_callback(a) {
     wasm.use_stack_callback(a);
 }
-export function __wbg___wbindgen_is_undefined_4a711ea9d2e1ef93(arg0) {
+export function __wbg___wbindgen_is_undefined_52709e72fb9f179c(arg0) {
     const ret = arg0 === undefined;
     return ret;
 }
-export function __wbg___wbindgen_throw_df03e93053e0f4bc(arg0, arg1) {
+export function __wbg___wbindgen_throw_6ddd609b62940d55(arg0, arg1) {
     throw new Error(getStringFromWasm0(arg0, arg1));
 }
-export function __wbg__wbg_cb_unref_9f02ce912168c354(arg0) {
+export function __wbg__wbg_cb_unref_6b5b6b8576d35cb1(arg0) {
     arg0._wbg_cb_unref();
 }
-export function __wbg_forEach_62e6385b396d46de(arg0, arg1, arg2) {
+export function __wbg_forEach_a2c08d9c3cc0524c(arg0, arg1, arg2) {
     try {
         var state0 = {a: arg1, b: arg2};
         var cb0 = (arg0, arg1, arg2) => {
@@ -38,7 +38,7 @@ export function __wbg_forEach_62e6385b396d46de(arg0, arg1, arg2) {
         state0.a = state0.b = 0;
     }
 }
-export function __wbg_instanceof_Window_0cc62e4f32542cc4(arg0) {
+export function __wbg_instanceof_Window_23e677d2c6843922(arg0) {
     let result;
     try {
         result = arg0 instanceof Window;
@@ -48,26 +48,26 @@ export function __wbg_instanceof_Window_0cc62e4f32542cc4(arg0) {
     const ret = result;
     return ret;
 }
-export function __wbg_log_91f1dd1dfd5a4ae8(arg0) {
+export function __wbg_log_524eedafa26daa59(arg0) {
     console.log(arg0);
 }
-export function __wbg_setTimeout_f2fd8043ff22af85() { return handleError(function (arg0, arg1) {
+export function __wbg_setTimeout_647865935a499f8b() { return handleError(function (arg0, arg1) {
     const ret = arg0.setTimeout(arg1);
     return ret;
 }, arguments); }
-export function __wbg_static_accessor_GLOBAL_THIS_6614f2f4998e3c4c() {
-    const ret = typeof globalThis === 'undefined' ? null : globalThis;
-    return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
-}
-export function __wbg_static_accessor_GLOBAL_d8e8a2fefe80bc1d() {
+export function __wbg_static_accessor_GLOBAL_8adb955bd33fac2f() {
     const ret = typeof global === 'undefined' ? null : global;
     return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
 }
-export function __wbg_static_accessor_SELF_e29eaf7c465526b1() {
+export function __wbg_static_accessor_GLOBAL_THIS_ad356e0db91c7913() {
+    const ret = typeof globalThis === 'undefined' ? null : globalThis;
+    return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
+}
+export function __wbg_static_accessor_SELF_f207c857566db248() {
     const ret = typeof self === 'undefined' ? null : self;
     return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
 }
-export function __wbg_static_accessor_WINDOW_66e7ca3eef30585a() {
+export function __wbg_static_accessor_WINDOW_bb9f1ba69d61b386() {
     const ret = typeof window === 'undefined' ? null : window;
     return isLikeNone(ret) ? 0 : addToExternrefTable0(ret);
 }
